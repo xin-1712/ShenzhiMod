@@ -76,12 +76,13 @@ object ShenzhiTables {
 	}
 
 	private fun readCompression(manager: ResourceManager): List<CompressionEntry> {
-		val entries = mutableListOf<CompressionEntry>()
+		// 以 output 为键去重：后读到的条目（数据包）覆盖先读到的（模组默认表）
+		val entries = LinkedHashMap<String, CompressionEntry>()
 		loadJson(manager, COMPRESSION_DIR) { json ->
 			val array = json.asJsonObject.getAsJsonArray("entries") ?: return@loadJson
 			for (element in array) {
 				val obj = element.asJsonObject
-				entries += CompressionEntry(
+				val entry = CompressionEntry(
 					outputPath = obj.get("output").asString,
 					sourceItemId = obj.get("source").asString,
 					count = obj.get("count").asInt,
@@ -89,18 +90,20 @@ object ShenzhiTables {
 					nameEn = obj.get("name_en")?.asString ?: obj.get("output").asString,
 					nameZh = obj.get("name_zh")?.asString ?: obj.get("output").asString,
 				)
+				entries[entry.outputPath] = entry
 			}
 		}
-		return entries
+		return entries.values.toList()
 	}
 
 	private fun readTransmutation(manager: ResourceManager): List<TransmutationEntry> {
-		val entries = mutableListOf<TransmutationEntry>()
+		// 以 id 为键去重，规则同上
+		val entries = LinkedHashMap<String, TransmutationEntry>()
 		loadJson(manager, TRANSMUTATION_DIR) { json ->
 			val array = json.asJsonObject.getAsJsonArray("entries") ?: return@loadJson
 			for (element in array) {
 				val obj = element.asJsonObject
-				entries += TransmutationEntry(
+				val entry = TransmutationEntry(
 					id = obj.get("id").asString,
 					inputItemId = obj.get("input").asString,
 					inputCount = obj.get("input_count").asInt,
@@ -110,15 +113,29 @@ object ShenzhiTables {
 					outputCount = obj.get("output_count").asInt,
 					durationTicks = obj.get("duration_ticks")?.asInt ?: 200,
 				)
+				entries[entry.id] = entry
 			}
 		}
-		return entries
+		return entries.values.toList()
 	}
 
+	/**
+	 * 读取目录下的所有数据表文件。
+	 *
+	 * **覆盖优先级是确定的**：先读模组自带的 `.../default.json`，再按 Identifier 字典序读其余文件，
+	 * 因此"数据包永远覆盖默认表"，且同一数据包目录内文件名靠后的优先。
+	 * 配合上面的按 key 去重，数据包改一条配方不会把整张表变成两条重复项。
+	 */
 	private fun loadJson(manager: ResourceManager, directory: String, consumer: (com.google.gson.JsonElement) -> Unit) {
 		val resources: Map<net.minecraft.resources.Identifier, Resource> =
 			manager.listResources(directory) { path -> path.path.endsWith(".json") }
-		resources.forEach { (id, resource) ->
+		val ordered = resources.entries.sortedWith(
+			compareBy(
+				{ if (ShenzhiMod.MOD_ID == it.key.namespace && it.key.path.endsWith("/default.json")) 0 else 1 },
+				{ it.key.toString() },
+			),
+		)
+		ordered.forEach { (id, resource) ->
 			resource.openAsReader().use { reader: Reader ->
 				consumer(JsonParser.parseReader(reader))
 			}
