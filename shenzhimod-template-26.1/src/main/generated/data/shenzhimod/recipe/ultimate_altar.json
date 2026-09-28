@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "d": "shenzhimod:synthetic_dragon_head",
+    "o": "minecraft:obsidian",
+    "s": "minecraft:nether_star"
+  },
+  "pattern": [
+    "dod",
+    "oso",
+    "dod"
+  ],
+  "result": {
+    "id": "shenzhimod:ultimate_altar"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:nether_star"
+  ],
+  "result": {
+    "count": 64,
+    "id": "shenzhimod:nether_star_shard"
+  }
+}

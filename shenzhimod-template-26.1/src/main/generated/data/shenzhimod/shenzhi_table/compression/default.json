@@ -1,0 +1,300 @@
+{
+  "entries": [
+    {
+      "output": "compressed_wheat",
+      "source": "minecraft:wheat",
+      "count": 3456,
+      "group": "agriculture",
+      "name_en": "Compressed Wheat",
+      "name_zh": "压缩小麦"
+    },
+    {
+      "output": "compressed_carrot",
+      "source": "minecraft:carrot",
+      "count": 3456,
+      "group": "agriculture",
+      "name_en": "Compressed Carrot",
+      "name_zh": "压缩胡萝卜"
+    },
+    {
+      "output": "compressed_potato",
+      "source": "minecraft:potato",
+      "count": 3456,
+      "group": "agriculture",
+      "name_en": "Compressed Potato",
+      "name_zh": "压缩马铃薯"
+    },
+    {
+      "output": "compressed_beetroot",
+      "source": "minecraft:beetroot",
+      "count": 3456,
+      "group": "agriculture",
+      "name_en": "Compressed Beetroot",
+      "name_zh": "压缩甜菜根"
+    },
+    {
+      "output": "compressed_sugar_cane",
+      "source": "minecraft:sugar_cane",
+      "count": 3456,
+      "group": "agriculture",
+      "name_en": "Compressed Sugar Cane",
+      "name_zh": "压缩甘蔗"
+    },
+    {
+      "output": "compressed_pumpkin",
+      "source": "minecraft:pumpkin",
+      "count": 3456,
+      "group": "agriculture",
+      "name_en": "Compressed Pumpkin",
+      "name_zh": "压缩南瓜"
+    },
+    {
+      "output": "compressed_melon_slice",
+      "source": "minecraft:melon_slice",
+      "count": 3456,
+      "group": "agriculture",
+      "name_en": "Compressed Melon Slice",
+      "name_zh": "压缩西瓜片"
+    },
+    {
+      "output": "compressed_cactus",
+      "source": "minecraft:cactus",
+      "count": 1728,
+      "group": "agriculture",
+      "name_en": "Compressed Cactus",
+      "name_zh": "压缩仙人掌"
+    },
+    {
+      "output": "compressed_bamboo",
+      "source": "minecraft:bamboo",
+      "count": 1728,
+      "group": "agriculture",
+      "name_en": "Compressed Bamboo",
+      "name_zh": "压缩竹子"
+    },
+    {
+      "output": "compressed_cocoa_beans",
+      "source": "minecraft:cocoa_beans",
+      "count": 1728,
+      "group": "agriculture",
+      "name_en": "Compressed Cocoa Beans",
+      "name_zh": "压缩可可豆"
+    },
+    {
+      "output": "compressed_sweet_berries",
+      "source": "minecraft:sweet_berries",
+      "count": 1728,
+      "group": "agriculture",
+      "name_en": "Compressed Sweet Berries",
+      "name_zh": "压缩甜浆果"
+    },
+    {
+      "output": "compressed_kelp",
+      "source": "minecraft:kelp",
+      "count": 1728,
+      "group": "agriculture",
+      "name_en": "Compressed Kelp",
+      "name_zh": "压缩海带"
+    },
+    {
+      "output": "compressed_nether_wart",
+      "source": "minecraft:nether_wart",
+      "count": 432,
+      "group": "agriculture",
+      "name_en": "Compressed Nether Wart",
+      "name_zh": "压缩下界疣"
+    },
+    {
+      "output": "compressed_apple",
+      "source": "minecraft:apple",
+      "count": 432,
+      "group": "agriculture",
+      "name_en": "Compressed Apple",
+      "name_zh": "压缩苹果"
+    },
+    {
+      "output": "compressed_coal",
+      "source": "minecraft:coal",
+      "count": 1728,
+      "group": "mineral",
+      "name_en": "Compressed Coal",
+      "name_zh": "压缩煤炭"
+    },
+    {
+      "output": "compressed_raw_iron",
+      "source": "minecraft:raw_iron",
+      "count": 1728,
+      "group": "mineral",
+      "name_en": "Compressed Raw Iron",
+      "name_zh": "压缩粗铁"
+    },
+    {
+      "output": "compressed_raw_copper",
+      "source": "minecraft:raw_copper",
+      "count": 1728,
+      "group": "mineral",
+      "name_en": "Compressed Raw Copper",
+      "name_zh": "压缩粗铜"
+    },
+    {
+      "output": "compressed_raw_gold",
+      "source": "minecraft:raw_gold",
+      "count": 1728,
+      "group": "mineral",
+      "name_en": "Compressed Raw Gold",
+      "name_zh": "压缩粗金"
+    },
+    {
+      "output": "compressed_redstone",
+      "source": "minecraft:redstone",
+      "count": 1728,
+      "group": "mineral",
+      "name_en": "Compressed Redstone",
+      "name_zh": "压缩红石粉"
+    },
+    {
+      "output": "compressed_lapis_lazuli",
+      "source": "minecraft:lapis_lazuli",
+      "count": 1728,
+      "group": "mineral",
+      "name_en": "Compressed Lapis Lazuli",
+      "name_zh": "压缩青金石"
+    },
+    {
+      "output": "compressed_quartz",
+      "source": "minecraft:quartz",
+      "count": 1728,
+      "group": "mineral",
+      "name_en": "Compressed Nether Quartz",
+      "name_zh": "压缩下界石英"
+    },
+    {
+      "output": "compressed_amethyst_shard",
+      "source": "minecraft:amethyst_shard",
+      "count": 1728,
+      "group": "mineral",
+      "name_en": "Compressed Amethyst Shard",
+      "name_zh": "压缩紫水晶碎片"
+    },
+    {
+      "output": "compressed_glowstone_dust",
+      "source": "minecraft:glowstone_dust",
+      "count": 1728,
+      "group": "mineral",
+      "name_en": "Compressed Glowstone Dust",
+      "name_zh": "压缩荧石粉"
+    },
+    {
+      "output": "compressed_diamond",
+      "source": "minecraft:diamond",
+      "count": 432,
+      "group": "mineral",
+      "name_en": "Compressed Diamond",
+      "name_zh": "压缩钻石"
+    },
+    {
+      "output": "compressed_emerald",
+      "source": "minecraft:emerald",
+      "count": 432,
+      "group": "mineral",
+      "name_en": "Compressed Emerald",
+      "name_zh": "压缩绿宝石"
+    },
+    {
+      "output": "compressed_rotten_flesh",
+      "source": "minecraft:rotten_flesh",
+      "count": 3456,
+      "group": "combat",
+      "name_en": "Compressed Rotten Flesh",
+      "name_zh": "压缩腐肉"
+    },
+    {
+      "output": "compressed_bone",
+      "source": "minecraft:bone",
+      "count": 3456,
+      "group": "combat",
+      "name_en": "Compressed Bone",
+      "name_zh": "压缩骨头"
+    },
+    {
+      "output": "compressed_string",
+      "source": "minecraft:string",
+      "count": 3456,
+      "group": "combat",
+      "name_en": "Compressed String",
+      "name_zh": "压缩线"
+    },
+    {
+      "output": "compressed_gunpowder",
+      "source": "minecraft:gunpowder",
+      "count": 3456,
+      "group": "combat",
+      "name_en": "Compressed Gunpowder",
+      "name_zh": "压缩火药"
+    },
+    {
+      "output": "compressed_spider_eye",
+      "source": "minecraft:spider_eye",
+      "count": 1728,
+      "group": "combat",
+      "name_en": "Compressed Spider Eye",
+      "name_zh": "压缩蜘蛛眼"
+    },
+    {
+      "output": "compressed_slime_ball",
+      "source": "minecraft:slime_ball",
+      "count": 1728,
+      "group": "combat",
+      "name_en": "Compressed Slimeball",
+      "name_zh": "压缩粘液球"
+    },
+    {
+      "output": "compressed_ender_pearl",
+      "source": "minecraft:ender_pearl",
+      "count": 1728,
+      "group": "combat",
+      "name_en": "Compressed Ender Pearl",
+      "name_zh": "压缩末影珍珠"
+    },
+    {
+      "output": "compressed_blaze_rod",
+      "source": "minecraft:blaze_rod",
+      "count": 1728,
+      "group": "combat",
+      "name_en": "Compressed Blaze Rod",
+      "name_zh": "压缩烈焰棒"
+    },
+    {
+      "output": "compressed_ghast_tear",
+      "source": "minecraft:ghast_tear",
+      "count": 1728,
+      "group": "combat",
+      "name_en": "Compressed Ghast Tear",
+      "name_zh": "压缩恶魂之泪"
+    },
+    {
+      "output": "compressed_phantom_membrane",
+      "source": "minecraft:phantom_membrane",
+      "count": 432,
+      "group": "combat",
+      "name_en": "Compressed Phantom Membrane",
+      "name_zh": "压缩幻翼膜"
+    },
+    {
+      "output": "compressed_magma_cream",
+      "source": "minecraft:magma_cream",
+      "count": 432,
+      "group": "combat",
+      "name_en": "Compressed Magma Cream",
+      "name_zh": "压缩岩浆膏"
+    },
+    {
+      "output": "compressed_shulker_shell",
+      "source": "minecraft:shulker_shell",
+      "count": 256,
+      "group": "combat",
+      "name_en": "Compressed Shulker Shell",
+      "name_zh": "压缩潜影壳"
+    }
+  ]
+}

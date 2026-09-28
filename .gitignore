@@ -1,0 +1,30 @@
+# --- Gradle / Loom ---
+.gradle/
+build/
+out/
+*.iml
+
+# --- IDE ---
+.idea/
+.vscode/
+.settings/
+.classpath
+.project
+
+# --- 本机 AI 助手配置（含 localhost MCP 地址等机器相关信息）---
+.codex/
+
+# --- 内部资料：只在本机保留，不进入公开仓库 ---
+# 需求与技术分析、开发计划、面向 AI 协作者的工程说明，以及任何只对开发机成立的信息
+ShenZhiMod-整合需求与技术分析.md
+AGENTS.md
+docs/
+local/
+
+# --- Minecraft dev run directory (worlds, logs, options) ---
+run/
+
+# --- OS noise ---
+.DS_Store
+Thumbs.db
+desktop.ini

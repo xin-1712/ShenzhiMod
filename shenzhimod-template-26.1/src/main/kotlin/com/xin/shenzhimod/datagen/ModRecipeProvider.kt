@@ -1,0 +1,126 @@
+package com.xin.shenzhimod.datagen
+
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
+import com.xin.shenzhimod.ShenzhiMod
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput
+
+/**
+ * 原版类型的配方（工作台）。压缩、核心合成、转化、融合都是自定义机制，不走这里。
+ *
+ * 配方来源（需求 §3.5 / §4.2 / §4.3 / §4.4 / §4.5）：
+ * - 方解石 = 石头×4 + 骨粉×4 → ×4；石灰岩 = 石头×4 + 燧石×4 → ×4；铜锭 = 铁锭×4 + 火药×4 → ×4
+ * - 下界之星分解：1 下界之星 → 64 下界之星碎片
+ * - 合成龙首 = 黑曜石×4 + 下界合金锭×4 + 原版龙首×1
+ * - 转化核心 = 黑曜石×4 + 下界合金锭×4 + 紫水晶块×1
+ * - 终极祭坛 = 黑曜石×4 + 合成龙首×4（四角）+ 下界之星×1（中心）
+ *   （按祭坛方块的构成推出，具体摆位仍待最终确认）
+ */
+class ModRecipeProvider(packOutput: FabricPackOutput) :
+	JsonDataProvider(packOutput, "ShenzhiMod recipes") {
+
+	override fun buildEntries(): Map<String, JsonObject> = linkedMapOf(
+		recipe("calcite_from_stone_and_bone_meal") {
+			shapeless(
+				ingredients = listOf(
+					"minecraft:stone", "minecraft:stone", "minecraft:stone", "minecraft:stone",
+					"minecraft:bone_meal", "minecraft:bone_meal", "minecraft:bone_meal", "minecraft:bone_meal",
+				),
+				result = "shenzhimod:calcite",
+				count = 4,
+			)
+		},
+		recipe("limestone_from_stone_and_flint") {
+			shapeless(
+				ingredients = listOf(
+					"minecraft:stone", "minecraft:stone", "minecraft:stone", "minecraft:stone",
+					"minecraft:flint", "minecraft:flint", "minecraft:flint", "minecraft:flint",
+				),
+				result = "shenzhimod:limestone",
+				count = 4,
+			)
+		},
+		recipe("copper_ingot_from_iron_ingot_and_gunpowder") {
+			shapeless(
+				ingredients = listOf(
+					"minecraft:iron_ingot", "minecraft:iron_ingot", "minecraft:iron_ingot", "minecraft:iron_ingot",
+					"minecraft:gunpowder", "minecraft:gunpowder", "minecraft:gunpowder", "minecraft:gunpowder",
+				),
+				result = "minecraft:copper_ingot",
+				count = 4,
+			)
+		},
+		recipe("nether_star_shard_from_nether_star") {
+			shapeless(ingredients = listOf("minecraft:nether_star"), result = "shenzhimod:nether_star_shard", count = 64)
+		},
+		recipe("synthetic_dragon_head") {
+			shaped(
+				pattern = listOf("oNo", "NdN", "oNo"),
+				keys = mapOf(
+					"o" to "minecraft:obsidian",
+					"N" to "minecraft:netherite_ingot",
+					"d" to "minecraft:dragon_head",
+				),
+				result = "shenzhimod:synthetic_dragon_head",
+			)
+		},
+		recipe("transmutation_core") {
+			shaped(
+				pattern = listOf("oNo", "NaN", "oNo"),
+				keys = mapOf(
+					"o" to "minecraft:obsidian",
+					"N" to "minecraft:netherite_ingot",
+					"a" to "minecraft:amethyst_block",
+				),
+				result = "shenzhimod:transmutation_core",
+			)
+		},
+		recipe("ultimate_altar") {
+			shaped(
+				pattern = listOf("dod", "oso", "dod"),
+				keys = mapOf(
+					"d" to "shenzhimod:synthetic_dragon_head",
+					"o" to "minecraft:obsidian",
+					"s" to "minecraft:nether_star",
+				),
+				result = "shenzhimod:ultimate_altar",
+			)
+		},
+	)
+
+	private fun recipe(name: String, body: RecipeHolder.() -> Unit): Pair<String, JsonObject> =
+		"data/${ShenzhiMod.MOD_ID}/recipe/$name.json" to RecipeHolder().apply(body).json
+
+	/** 简易配方构造器，只支持工作台的有序/无序两种。 */
+	private class RecipeHolder {
+		val json = JsonObject()
+
+		fun shapeless(ingredients: List<String>, result: String, count: Int) {
+			json.addProperty("type", "minecraft:crafting_shapeless")
+			json.addProperty("category", "misc")
+			val array = JsonArray()
+			ingredients.forEach(array::add)
+			json.add("ingredients", array)
+			json.add("result", result(result, count))
+		}
+
+		fun shaped(pattern: List<String>, keys: Map<String, String>, result: String, count: Int = 1) {
+			json.addProperty("type", "minecraft:crafting_shaped")
+			json.addProperty("category", "misc")
+			val keyObject = JsonObject()
+			keys.forEach { (symbol, item) -> keyObject.addProperty(symbol, item) }
+			json.add("key", keyObject)
+			val patternArray = JsonArray()
+			pattern.forEach(patternArray::add)
+			json.add("pattern", patternArray)
+			json.add("result", result(result, count))
+		}
+
+		private fun result(item: String, count: Int): JsonObject {
+			val result = JsonObject()
+			if (count > 1) result.addProperty("count", count)
+			result.addProperty("id", item)
+			return result
+		}
+	}
+}

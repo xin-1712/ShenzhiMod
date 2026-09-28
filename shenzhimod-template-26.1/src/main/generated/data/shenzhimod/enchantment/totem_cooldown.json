@@ -1,0 +1,20 @@
+{
+  "description": {
+    "translate": "enchantment.shenzhimod.totem_cooldown"
+  },
+  "supported_items": "minecraft:totem_of_undying",
+  "max_level": 1,
+  "weight": 1,
+  "anvil_cost": 1,
+  "min_cost": {
+    "base": 1,
+    "per_level_above_first": 0
+  },
+  "max_cost": {
+    "base": 1,
+    "per_level_above_first": 0
+  },
+  "slots": [
+    "any"
+  ]
+}

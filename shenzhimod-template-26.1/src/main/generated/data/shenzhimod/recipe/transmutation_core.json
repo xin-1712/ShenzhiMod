@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "o": "minecraft:obsidian",
+    "N": "minecraft:netherite_ingot",
+    "a": "minecraft:amethyst_block"
+  },
+  "pattern": [
+    "oNo",
+    "NaN",
+    "oNo"
+  ],
+  "result": {
+    "id": "shenzhimod:transmutation_core"
+  }
+}

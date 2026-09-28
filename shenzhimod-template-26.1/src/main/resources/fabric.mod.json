@@ -1,0 +1,54 @@
+{
+	"schemaVersion": 1,
+	"id": "shenzhimod",
+	"version": "${version}",
+	"name": "ShenzhiMod",
+	"description": "面向生电玩家的终局体系：压缩体系 → 三核心 → 创世核心，外加核心附魔 / 图腾冷却 / 鞘翅飞行，以及堡垒遗迹猪灵蛮兵量产远古残骸。",
+	"authors": [
+		"ShenzhiMod Contributors"
+	],
+	"contact": {
+		"homepage": "https://github.com/",
+		"sources": "https://github.com/"
+	},
+	"license": "MIT",
+	"icon": "assets/shenzhimod/icon.png",
+	"custom": {
+		"modmenu": {
+			"links": {
+				"modmenu.license": "https://opensource.org/licenses/MIT"
+			}
+		}
+	},
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			{
+				"value": "com.xin.shenzhimod.ShenzhiMod",
+				"adapter": "kotlin"
+			}
+		],
+		"fabric-datagen": [
+			{
+				"value": "com.xin.shenzhimod.ShenzhiModDataGenerator",
+				"adapter": "kotlin"
+			}
+		],
+		"client": [
+			{
+				"value": "com.xin.shenzhimod.ShenzhiModClient",
+				"adapter": "kotlin"
+			}
+		]
+	},
+	"mixins": [
+		"shenzhimod.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~26.1",
+		"java": ">=25",
+		"fabric-api": "*",
+		"fabric-language-kotlin": "*"
+	}
+}

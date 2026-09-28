@@ -1,0 +1,34 @@
+{
+  "entries": [
+    {
+      "id": "coal_block_to_diamond",
+      "input": "minecraft:coal_block",
+      "input_count": 1,
+      "catalyst": "shenzhimod:nether_star_shard",
+      "catalyst_count": 1,
+      "output": "minecraft:diamond",
+      "output_count": 1,
+      "duration_ticks": 200
+    },
+    {
+      "id": "calcite_to_amethyst_shard",
+      "input": "shenzhimod:calcite",
+      "input_count": 8,
+      "catalyst": "minecraft:blaze_powder",
+      "catalyst_count": 1,
+      "output": "minecraft:amethyst_shard",
+      "output_count": 4,
+      "duration_ticks": 200
+    },
+    {
+      "id": "limestone_to_lapis_lazuli",
+      "input": "shenzhimod:limestone",
+      "input_count": 8,
+      "catalyst": "minecraft:ghast_tear",
+      "catalyst_count": 1,
+      "output": "minecraft:lapis_lazuli",
+      "output_count": 4,
+      "duration_ticks": 200
+    }
+  ]
+}

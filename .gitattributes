@@ -1,0 +1,16 @@
+# 统一换行符，避免 Windows / macOS / Linux 协作时产生整文件级的 diff
+* text=auto eol=lf
+
+# 二进制资源不做换行符转换
+*.jar binary
+*.png binary
+*.ogg binary
+*.zip binary
+
+# 脚本各按平台约定
+gradlew text eol=lf
+*.bat text eol=crlf
+*.sh text eol=lf
+
+# 生成物在 diff 里折叠
+src/main/generated/** linguist-generated=true

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "o": "minecraft:obsidian",
+    "N": "minecraft:netherite_ingot",
+    "d": "minecraft:dragon_head"
+  },
+  "pattern": [
+    "oNo",
+    "NdN",
+    "oNo"
+  ],
+  "result": {
+    "id": "shenzhimod:synthetic_dragon_head"
+  }
+}
