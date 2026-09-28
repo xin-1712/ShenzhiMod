@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "shenzhimod:item/compressed_cactus"
+    "layer0": "shenzhimod:item/compressed_cod"
   }
 }

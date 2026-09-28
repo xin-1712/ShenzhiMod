@@ -9,12 +9,12 @@ import net.minecraft.world.item.Rarity
 /**
  * 物品注册（模块 A/B/C/D/E）。
  *
- * 44 个物品 = 37 个压缩态 + 4 个核心 + 1 个下界之星碎片 + 2 个前体材料（方解石/石灰岩）。
+ * 43 个物品 = 37 个压缩态 + 4 个核心 + 1 个下界之星碎片 + 1 个前体材料（石灰岩）。
+ * 方解石**沿用原版 `minecraft:calcite`**，模组只提供配方、不新增同名物品（铜锭/下界合金锭同理）。
  * 压缩态**全部由 [CompressionDefaults] 推导**，新增一条配方只需改那张表。
  */
 object ModItems {
 	// ---- 前体材料（模块 D） ----
-	val CALCITE: Item = ModRegistry.item("calcite") { Item(it.stacksTo(64)) }
 	val LIMESTONE: Item = ModRegistry.item("limestone") { Item(it.stacksTo(64)) }
 
 	// ---- 投掷物材料（模块 H） ----
@@ -40,7 +40,6 @@ object ModItems {
 
 	/** 稳定的展示顺序（创造栏、数据生成、测试都用它）。 */
 	val ALL: List<Item> = buildList {
-		add(CALCITE)
 		add(LIMESTONE)
 		add(NETHER_STAR_SHARD)
 		add(AGRICULTURE_CORE)

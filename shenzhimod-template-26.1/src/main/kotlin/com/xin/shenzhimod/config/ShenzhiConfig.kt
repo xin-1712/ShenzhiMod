@@ -78,7 +78,7 @@ data class TransmutationSection(
 
 /** 模块 E：终极祭坛。 */
 data class AltarSection(
-	/** 融合每一段吸收时长（tick），三段合计。 */
+	/** 融合每一段吸收时长（tick）。三段合计 = 600 tick = **30 秒**（定案值）。 */
 	var absorbStageTicks: Int = 200,
 	/** 需要的核心数量。 */
 	var requiredCores: Int = 3,
@@ -128,10 +128,17 @@ data class TotemSection(
 data class FlightSection(
 	/** 总倍率，供服务器整体调整手感。 */
 	var speedScale: Double = 1.0,
-	/** 非疾跑飞行速度基准（接近原版生存行走速度）。 */
-	var baseFlyingSpeed: Double = 0.05,
-	/** 疾跑飞行速度基准。 */
-	var sprintFlyingSpeed: Double = 0.075,
+	/**
+	 * 非疾跑飞行速度基准：**等于原版生存走路速度**。
+	 *
+	 * 换算依据（需实机校准，见文档 V12）：
+	 * - 原版创造飞行的 `Abilities.flyingSpeed` 默认 0.05 → 约 10.89 格/秒；
+	 * - 生存走路 4.317 格/秒（`MOVEMENT_SPEED` 0.1），疾跑 5.612 格/秒（×1.3）；
+	 * - 水平速度与 `flyingSpeed` 成正比，故 0.05 × 4.317 / 10.89 ≈ 0.0198。
+	 */
+	var baseFlyingSpeed: Double = 0.0198,
+	/** 疾跑飞行速度基准：等于原版生存疾跑速度，0.05 × 5.612 / 10.89 ≈ 0.0258。 */
+	var sprintFlyingSpeed: Double = 0.0258,
 	/** 是否把移动速度属性与速度类状态效果计入飞行速度。 */
 	var applyMovementSpeedAttributes: Boolean = true,
 	/** 是否在穿戴飞行鞘翅时禁用原版滑翔，避免"滑翔/飞行"抖动。 */

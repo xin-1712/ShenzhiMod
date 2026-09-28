@@ -24,7 +24,6 @@ class ModLanguageProvider(
 		val english = languageCode == "en_us"
 		val text = if (english) EN else ZH
 
-		builder.add(ModItems.CALCITE, text.calcite)
 		builder.add(ModItems.LIMESTONE, text.limestone)
 		builder.add(ModItems.NETHER_STAR_SHARD, text.netherStarShard)
 		builder.add(ModItems.AGRICULTURE_CORE, text.agricultureCore)
@@ -54,7 +53,6 @@ class ModLanguageProvider(
 	}
 
 	private data class Texts(
-		val calcite: String,
 		val limestone: String,
 		val netherStarShard: String,
 		val agricultureCore: String,
@@ -79,7 +77,6 @@ class ModLanguageProvider(
 
 	private companion object {
 		val EN = Texts(
-			calcite = "Calcite",
 			limestone = "Limestone",
 			netherStarShard = "Nether Star Shard",
 			agricultureCore = "Agriculture Core",
@@ -103,7 +100,6 @@ class ModLanguageProvider(
 		)
 
 		val ZH = Texts(
-			calcite = "方解石",
 			limestone = "石灰岩",
 			netherStarShard = "下界之星碎片",
 			agricultureCore = "农业核心",

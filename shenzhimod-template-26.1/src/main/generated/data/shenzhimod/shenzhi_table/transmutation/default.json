@@ -12,7 +12,7 @@
     },
     {
       "id": "calcite_to_amethyst_shard",
-      "input": "shenzhimod:calcite",
+      "input": "minecraft:calcite",
       "input_count": 8,
       "catalyst": "minecraft:blaze_powder",
       "catalyst_count": 1,

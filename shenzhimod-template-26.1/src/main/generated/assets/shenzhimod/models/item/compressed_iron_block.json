@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "shenzhimod:item/compressed_quartz"
+    "layer0": "shenzhimod:item/compressed_iron_block"
   }
 }

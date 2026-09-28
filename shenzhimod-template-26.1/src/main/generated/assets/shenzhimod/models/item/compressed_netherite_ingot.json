@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "shenzhimod:item/compressed_glowstone_dust"
+    "layer0": "shenzhimod:item/compressed_netherite_ingot"
   }
 }

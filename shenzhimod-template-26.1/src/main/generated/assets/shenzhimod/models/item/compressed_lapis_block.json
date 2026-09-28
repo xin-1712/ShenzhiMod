@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "shenzhimod:item/compressed_raw_copper"
+    "layer0": "shenzhimod:item/compressed_lapis_block"
   }
 }

@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "shenzhimod:item/compressed_raw_iron"
+    "layer0": "shenzhimod:item/compressed_emerald_block"
   }
 }

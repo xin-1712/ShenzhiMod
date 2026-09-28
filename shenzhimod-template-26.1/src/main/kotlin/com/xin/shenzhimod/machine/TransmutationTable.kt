@@ -56,7 +56,7 @@ object TransmutationDefaults {
 		),
 		TransmutationEntry(
 			id = "calcite_to_amethyst_shard",
-			inputItemId = "shenzhimod:calcite",
+			inputItemId = "minecraft:calcite",
 			inputCount = 8,
 			catalystItemId = "minecraft:blaze_powder",
 			catalystCount = 1,

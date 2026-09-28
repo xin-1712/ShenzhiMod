@@ -9,12 +9,12 @@ import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput
  * 原版类型的配方（工作台）。压缩、核心合成、转化、融合都是自定义机制，不走这里。
  *
  * 配方来源（需求 §3.5 / §4.2 / §4.3 / §4.4 / §4.5）：
- * - 方解石 = 石头×4 + 骨粉×4 → ×4；石灰岩 = 石头×4 + 燧石×4 → ×4；铜锭 = 铁锭×4 + 火药×4 → ×4
+ * - 方解石 = 石头×4 + 骨粉×4 → **原版 `minecraft:calcite`** ×4（不新增同名物品）
+ * - 石灰岩 = 石头×4 + 燧石×4 → `shenzhimod:limestone` ×4；铜锭 = 铁锭×4 + 火药×4 → 原版铜锭 ×4
  * - 下界之星分解：1 下界之星 → 64 下界之星碎片
  * - 合成龙首 = 黑曜石×4 + 下界合金锭×4 + 原版龙首×1
  * - 转化核心 = 黑曜石×4 + 下界合金锭×4 + 紫水晶块×1
- * - 终极祭坛 = 黑曜石×4 + 合成龙首×4（四角）+ 下界之星×1（中心）
- *   （按祭坛方块的构成推出，具体摆位仍待最终确认）
+ * - 终极祭坛 = 中心 1 个合成龙首 + 四边 4 个下界之星 + 四角 4 个黑曜石（3×3，90° 旋转对称）
  */
 class ModRecipeProvider(packOutput: FabricPackOutput) :
 	JsonDataProvider(packOutput, "ShenzhiMod recipes") {
@@ -26,7 +26,7 @@ class ModRecipeProvider(packOutput: FabricPackOutput) :
 					"minecraft:stone", "minecraft:stone", "minecraft:stone", "minecraft:stone",
 					"minecraft:bone_meal", "minecraft:bone_meal", "minecraft:bone_meal", "minecraft:bone_meal",
 				),
-				result = "shenzhimod:calcite",
+				result = "minecraft:calcite",
 				count = 4,
 			)
 		},
@@ -77,11 +77,11 @@ class ModRecipeProvider(packOutput: FabricPackOutput) :
 		},
 		recipe("ultimate_altar") {
 			shaped(
-				pattern = listOf("dod", "oso", "dod"),
+				pattern = listOf("oso", "sDs", "oso"),
 				keys = mapOf(
-					"d" to "shenzhimod:synthetic_dragon_head",
 					"o" to "minecraft:obsidian",
 					"s" to "minecraft:nether_star",
+					"D" to "shenzhimod:synthetic_dragon_head",
 				),
 				result = "shenzhimod:ultimate_altar",
 			)
