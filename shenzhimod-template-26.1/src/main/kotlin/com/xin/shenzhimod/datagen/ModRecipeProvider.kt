@@ -13,7 +13,8 @@ import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput
  * - 石灰岩 = 石头×4 + 燧石×4 → `shenzhimod:limestone` ×4；铜锭 = 铁锭×4 + 火药×4 → 原版铜锭 ×4
  * - 下界之星分解：1 下界之星 → 64 下界之星碎片
  * - 合成龙首 = 黑曜石×4 + 下界合金锭×4 + 原版龙首×1
- * - 转化核心 = 黑曜石×4 + 下界合金锭×4 + 紫水晶块×1
+ * - 转化核心 = 黑曜石×4 + **钻石×4** + 紫水晶块×1
+ *   （原稿是下界合金锭×4，实测后按"转化核心需要大量制作"的反馈下调为钻石；已同步需求文档 §4.3）
  * - 终极祭坛 = 中心 1 个合成龙首 + 四边 4 个下界之星 + 四角 4 个黑曜石（3×3，90° 旋转对称）
  */
 class ModRecipeProvider(packOutput: FabricPackOutput) :
@@ -69,7 +70,7 @@ class ModRecipeProvider(packOutput: FabricPackOutput) :
 				pattern = listOf("oNo", "NaN", "oNo"),
 				keys = mapOf(
 					"o" to "minecraft:obsidian",
-					"N" to "minecraft:netherite_ingot",
+					"N" to "minecraft:diamond",
 					"a" to "minecraft:amethyst_block",
 				),
 				result = "shenzhimod:transmutation_core",

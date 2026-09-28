@@ -27,7 +27,7 @@ object CoreAssemblyDefaults {
 		CoreAssemblyRecipe(
 			outputItemId = output,
 			group = group,
-			requirements = table.byGroup(group).map { CoreRequirement("shenzhimod:${it.outputPath}", 1) },
+			requirements = table.byGroup(group).map { CoreRequirement(it.outputPath, 1) },
 		)
 
 	/** 核心物品 ID 与分组的对应关系（龙首判定用）。 */
@@ -50,7 +50,7 @@ sealed interface AssemblyMatch {
  */
 fun List<CoreAssemblyRecipe>.match(stored: Map<String, Int>): AssemblyMatch {
 	for (recipe in this) {
-		val satisfied = recipe.requirements.all { (stored[it.itemId] ?: 0) >= it.count }
+		val satisfied = recipe.requirements.all { (stored[it.ledgerKey] ?: 0) >= it.count }
 		if (satisfied) return AssemblyMatch.Matched(recipe)
 	}
 	return AssemblyMatch.None

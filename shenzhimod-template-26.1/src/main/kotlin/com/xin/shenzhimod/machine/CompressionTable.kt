@@ -39,8 +39,14 @@ data class CompressionEntry(
 	val nameZh: String,
 )
 
-/** 一条核心合成需求。 */
-data class CoreRequirement(val itemId: String, val count: Int)
+/**
+ * 一条核心合成需求。
+ *
+ * @param ledgerKey **账本键 = 模组内路径，不含命名空间**（如 `compressed_wheat`）。
+ *   必须与 [DragonHeadLedger] 使用的键格式完全一致——曾经因为这里写成 `shenzhimod:compressed_wheat`
+ *   而账本存的是 `compressed_wheat`，导致"材料凑齐也永远合不出核心"。
+ */
+data class CoreRequirement(val ledgerKey: String, val count: Int)
 
 /**
  * 压缩表：支持按"产物"和"被压缩物"双向查询。

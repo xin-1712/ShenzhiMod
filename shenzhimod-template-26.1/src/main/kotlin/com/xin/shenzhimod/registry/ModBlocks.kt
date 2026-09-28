@@ -17,12 +17,12 @@ import net.minecraft.world.level.material.MapColor
  */
 object ModBlocks {
 	val SYNTHETIC_DRAGON_HEAD: Block = ModRegistry.block("synthetic_dragon_head") { properties ->
+		// 机器方块不设"必须用镐"：生存里需要频繁拆装/复测，掉率也不该被工具卡住
 		SyntheticDragonHeadBlock(
 			properties
 				.mapColor(MapColor.COLOR_BLACK)
-				.strength(3.5f, 6.0f)
-				.sound(SoundType.STONE)
-				.requiresCorrectToolForDrops(),
+				.strength(2.0f, 6.0f)
+				.sound(SoundType.STONE),
 		)
 	}
 
@@ -30,9 +30,8 @@ object ModBlocks {
 		TransmutationCoreBlock(
 			properties
 				.mapColor(MapColor.COLOR_PURPLE)
-				.strength(3.5f, 6.0f)
+				.strength(2.0f, 6.0f)
 				.sound(SoundType.AMETHYST)
-				.requiresCorrectToolForDrops()
 				.lightLevel { LIGHT_LEVEL },
 		)
 	}
@@ -41,9 +40,8 @@ object ModBlocks {
 		UltimateAltarBlock(
 			properties
 				.mapColor(MapColor.COLOR_BLACK)
-				.strength(5.0f, 12.0f)
+				.strength(3.0f, 12.0f)
 				.sound(SoundType.STONE)
-				.requiresCorrectToolForDrops()
 				.lightLevel { LIGHT_LEVEL },
 		)
 	}

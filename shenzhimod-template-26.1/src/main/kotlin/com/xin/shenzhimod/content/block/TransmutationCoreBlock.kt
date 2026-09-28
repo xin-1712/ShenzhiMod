@@ -5,7 +5,6 @@ import com.xin.shenzhimod.content.blockentity.TransmutationCoreBlockEntity
 import com.xin.shenzhimod.registry.ModBlockEntities
 import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ServerLevel
-import net.minecraft.world.Containers
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.BaseEntityBlock
 import net.minecraft.world.level.block.RenderShape
@@ -43,9 +42,6 @@ class TransmutationCoreBlock(properties: Properties) : BaseEntityBlock(propertie
 		}
 	}
 
-	override fun affectNeighborsAfterRemoval(state: BlockState, level: ServerLevel, pos: BlockPos, movedByPiston: Boolean) {
-		val blockEntity = level.getBlockEntity(pos) as? TransmutationCoreBlockEntity
-		blockEntity?.let { Containers.dropContents(level, pos, it) }
-		super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston)
-	}
+	// 三个槽位的掉落交给原版机制：BlockEntity#preRemoveSideEffects 会对实现了 Container 的方块实体
+	// 自动调用 Containers.dropContents（本类是 WorldlyContainer，所以无需自己写，写了反而会掉两次）。
 }

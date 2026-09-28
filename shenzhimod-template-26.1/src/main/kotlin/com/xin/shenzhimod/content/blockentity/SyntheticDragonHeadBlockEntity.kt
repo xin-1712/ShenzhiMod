@@ -10,8 +10,11 @@ import com.xin.shenzhimod.machine.match
 import com.xin.shenzhimod.registry.ModBlockEntities
 import com.xin.shenzhimod.util.ItemStacks
 import net.minecraft.core.BlockPos
+import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.BlockEntity
@@ -135,6 +138,10 @@ class SyntheticDragonHeadBlockEntity(pos: BlockPos, state: BlockState) :
 		craftTicks = 0
 		craftRecipe = null
 		setChanged()
+		level.playSound(null, pos.x + 0.5, pos.y + 1.0, pos.z + 0.5, SoundEvents.BEACON_POWER_SELECT, SoundSource.BLOCKS, 1.0f, 1.2f)
+		if (ShenzhiMod.config.visual.particlesEnabled) {
+			level.sendParticles(ParticleTypes.END_ROD, pos.x + 0.5, pos.y + 1.2, pos.z + 0.5, 30, 0.5, 0.5, 0.5, 0.08)
+		}
 		spawn(level, pos, ItemStacks.of(matched.recipe.outputItemId), 0.2)
 	}
 
@@ -158,6 +165,17 @@ class SyntheticDragonHeadBlockEntity(pos: BlockPos, state: BlockState) :
 		for ((path, amount) in contents) {
 			spawn(level, worldPosition, ItemStacks.ofMod(path, amount), 0.1)
 		}
+	}
+
+	/**
+	 * 方块被移除时的原版钩子（26.1）。
+	 *
+	 * ⚠️ 不要改用方块的 `affectNeighborsAfterRemoval`：实测那时方块实体已经取不到，
+	 * 账本内容会凭空消失（这是踩过的坑）。也不要在方块里额外调用 `Containers.dropContents`。
+	 */
+	override fun preRemoveSideEffects(pos: BlockPos, state: BlockState) {
+		super.preRemoveSideEffects(pos, state)
+		dropStoredContents()
 	}
 
 	private fun spawn(level: ServerLevel, pos: BlockPos, stack: ItemStack, velocity: Double) {

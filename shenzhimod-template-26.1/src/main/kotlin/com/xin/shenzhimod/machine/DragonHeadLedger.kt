@@ -53,11 +53,11 @@ class DragonHeadLedger(private val capacity: Int) {
 	fun tryConsume(requirements: List<CoreRequirement>): Boolean {
 		if (requirements.isEmpty()) return false
 		for (requirement in requirements) {
-			if (amountOf(requirement.itemId) < requirement.count) return false
+			if (amountOf(requirement.ledgerKey) < requirement.count) return false
 		}
 		for (requirement in requirements) {
-			val left = amountOf(requirement.itemId) - requirement.count
-			if (left <= 0) stored.remove(requirement.itemId) else stored[requirement.itemId] = left
+			val left = amountOf(requirement.ledgerKey) - requirement.count
+			if (left <= 0) stored.remove(requirement.ledgerKey) else stored[requirement.ledgerKey] = left
 		}
 		return true
 	}

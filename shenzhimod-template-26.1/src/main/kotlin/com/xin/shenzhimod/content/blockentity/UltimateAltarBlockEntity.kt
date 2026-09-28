@@ -8,8 +8,11 @@ import com.xin.shenzhimod.machine.CoreAssemblyDefaults
 import com.xin.shenzhimod.registry.ModBlockEntities
 import com.xin.shenzhimod.util.ItemStacks
 import net.minecraft.core.BlockPos
+import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LightningBolt
 import net.minecraft.world.entity.item.ItemEntity
@@ -42,12 +45,14 @@ class UltimateAltarBlockEntity(pos: BlockPos, state: BlockState) :
 
 	private var baseValid: Boolean = false
 	private var baseCheckCooldown: Int = 0
+	private var effectTick: Int = 0
 
 	fun markBaseDirty() {
 		baseCheckCooldown = 0
 	}
 
 	fun serverTick(level: ServerLevel, pos: BlockPos, state: BlockState) {
+		effectTick++
 		if (baseCheckCooldown > 0) baseCheckCooldown--
 		if (baseCheckCooldown == 0) {
 			baseValid = checkBase(level, pos)
@@ -64,21 +69,74 @@ class UltimateAltarBlockEntity(pos: BlockPos, state: BlockState) :
 		when (val event = fusion.tick(present)) {
 			is AltarEvent.StageAbsorbed -> {
 				consumeOneCore(level, pos)
+				playStageEffects(level, pos, event.absorbed)
 				setChanged()
 			}
 
 			AltarEvent.FusionComplete -> {
 				setChanged()
+				// 先放特效（含落雷）再产出，避免产物先落地被雷声"抢戏"
+				playCompletionEffects(level, pos)
 				spawnOutput(level, pos)
 			}
 
 			AltarEvent.Aborted -> {
 				setChanged()
 				strikeVisualLightning(level, pos)
+				level.playSound(null, pos.x + 0.5, pos.y + 0.5, pos.z + 0.5, SoundEvents.ENDER_DRAGON_HURT, SoundSource.BLOCKS, 1.0f, 0.7f)
 			}
 
-			AltarEvent.Idle -> Unit
+			AltarEvent.Idle -> if (fusion.isRunning()) spawnChargeParticles(level, pos)
 		}
+	}
+
+	// ---- 特效（全部用原版粒子与音效，不需要额外贴图/音频文件）----
+
+	/**
+	 * 融合进行中的"末影龙复活式光线"：
+	 * 祭坛中心升起一道竖直的 END_ROD 光柱，底部伴随灵魂火与电流粒子。
+	 */
+	private fun spawnChargeParticles(level: ServerLevel, pos: BlockPos) {
+		val visual = ShenzhiMod.config.visual
+		if (!visual.particlesEnabled) return
+		if (effectTick % 2 != 0) return
+
+		val cx = pos.x + 0.5
+		val cz = pos.z + 0.5
+		val columnHeight = 6
+		val y = pos.y + 1.0 + level.random.nextDouble() * columnHeight
+		level.sendParticles(ParticleTypes.END_ROD, cx, y, cz, 1, 0.12, 0.0, 0.12, 0.0)
+
+		val density = visual.particleDensity.coerceIn(0.0, 1.0)
+		if (level.random.nextDouble() < density) {
+			level.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, cx, pos.y + 1.15, cz, 2, 0.35, 0.15, 0.35, 0.005)
+		}
+		if (level.random.nextDouble() < density * 0.5) {
+			level.sendParticles(ParticleTypes.ELECTRIC_SPARK, cx, pos.y + 1.3, cz, 2, 0.45, 0.25, 0.45, 0.02)
+		}
+	}
+
+	/** 一段核心被吸收：短促的龙翼声 + 一次小爆发。 */
+	private fun playStageEffects(level: ServerLevel, pos: BlockPos, absorbed: Int) {
+		val cx = pos.x + 0.5
+		val cy = pos.y + 1.2
+		val cz = pos.z + 0.5
+		level.playSound(null, cx, cy, cz, SoundEvents.ENDER_DRAGON_FLAP, SoundSource.BLOCKS, 1.0f, 0.8f + absorbed * 0.1f)
+		if (!ShenzhiMod.config.visual.particlesEnabled) return
+		level.sendParticles(ParticleTypes.END_ROD, cx, cy, cz, 24, 0.6, 0.6, 0.6, 0.05)
+		level.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, cx, cy, cz, 12, 0.5, 0.4, 0.5, 0.02)
+	}
+
+	/** 融合完成：落雷 + 龙吼 + 大爆发（落雷为视觉专用，不破坏方块、不引燃）。 */
+	private fun playCompletionEffects(level: ServerLevel, pos: BlockPos) {
+		strikeVisualLightning(level, pos)
+		val cx = pos.x + 0.5
+		val cy = pos.y + 1.5
+		val cz = pos.z + 0.5
+		level.playSound(null, cx, cy, cz, SoundEvents.ENDER_DRAGON_GROWL, SoundSource.BLOCKS, 1.0f, 1.0f)
+		if (!ShenzhiMod.config.visual.particlesEnabled) return
+		level.sendParticles(ParticleTypes.END_ROD, cx, cy, cz, 80, 1.2, 1.0, 1.2, 0.15)
+		level.sendParticles(ParticleTypes.ELECTRIC_SPARK, cx, cy, cz, 40, 1.0, 0.8, 1.0, 0.1)
 	}
 
 	/** Shift+右键启动。 */
@@ -90,6 +148,7 @@ class UltimateAltarBlockEntity(pos: BlockPos, state: BlockState) :
 		}
 		val present = countCores(level, worldPosition)
 		if (fusion.start(present)) {
+			level.playSound(null, worldPosition.x + 0.5, worldPosition.y + 0.5, worldPosition.z + 0.5, SoundEvents.BEACON_ACTIVATE, SoundSource.BLOCKS, 1.0f, 1.0f)
 			player.sendSystemMessage(Component.translatable("message.shenzhimod.altar.started"))
 			setChanged()
 		} else {

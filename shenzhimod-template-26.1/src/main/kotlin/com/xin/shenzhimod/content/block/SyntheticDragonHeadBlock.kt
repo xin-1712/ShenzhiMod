@@ -87,11 +87,8 @@ class SyntheticDragonHeadBlock(properties: Properties) : BaseEntityBlock(propert
 		return InteractionResult.SUCCESS
 	}
 
-	override fun affectNeighborsAfterRemoval(state: BlockState, level: ServerLevel, pos: BlockPos, movedByPiston: Boolean) {
-		val blockEntity = level.getBlockEntity(pos) as? SyntheticDragonHeadBlockEntity
-		blockEntity?.dropStoredContents()
-		super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston)
-	}
+	// 内容物掉落由方块实体的 preRemoveSideEffects() 负责：
+	// 放在这里的 affectNeighborsAfterRemoval 实测太晚，那时拿不到 BlockEntity，账本会凭空消失。
 
 	companion object {
 		val POWERED: BooleanProperty = BlockStateProperties.POWERED
