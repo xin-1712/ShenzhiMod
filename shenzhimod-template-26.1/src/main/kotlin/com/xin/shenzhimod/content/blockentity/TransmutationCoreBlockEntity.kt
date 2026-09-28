@@ -1,19 +1,26 @@
 package com.xin.shenzhimod.content.blockentity
 
 import com.xin.shenzhimod.ShenzhiMod
+import com.xin.shenzhimod.content.menu.TransmutationCoreMenu
 import com.xin.shenzhimod.data.ShenzhiTables
 import com.xin.shenzhimod.machine.TransmutationEntry
 import com.xin.shenzhimod.machine.TransmutationProcess
 import com.xin.shenzhimod.registry.ModBlockEntities
 import com.xin.shenzhimod.util.ItemStacks
+import net.fabricmc.fabric.api.menu.v1.ExtendedMenuProvider
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.NonNullList
+import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.Container
 import net.minecraft.world.ContainerHelper
 import net.minecraft.world.WorldlyContainer
+import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.inventory.AbstractContainerMenu
+import net.minecraft.world.inventory.ContainerData
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
@@ -33,7 +40,8 @@ import net.minecraft.world.level.storage.ValueOutput
  */
 class TransmutationCoreBlockEntity(pos: BlockPos, state: BlockState) :
 	BlockEntity(ModBlockEntities.TRANSMUTATION_CORE, pos, state),
-	WorldlyContainer {
+	WorldlyContainer,
+	ExtendedMenuProvider<BlockPos> {
 
 	private var items: NonNullList<ItemStack> = NonNullList.withSize(SLOT_COUNT, ItemStack.EMPTY)
 
@@ -143,6 +151,31 @@ class TransmutationCoreBlockEntity(pos: BlockPos, state: BlockState) :
 
 	override fun canTakeItemThroughFace(slot: Int, itemStack: ItemStack, direction: Direction): Boolean =
 		direction == Direction.DOWN && slot == SLOT_OUTPUT
+
+	// ---- 界面（GUI）----
+
+	/**
+	 * 菜单用的进度数据：0 = 已运行 tick，1 = 本次配方总时长。
+	 * 客户端只读；服务端每 tick 由原版菜单同步机制推给客户端。
+	 */
+	fun createContainerData(): ContainerData = object : ContainerData {
+		override fun get(index: Int): Int = when (index) {
+			0 -> process.progressTicks
+			1 -> currentRecipe()?.durationTicks ?: ShenzhiMod.config.transmutation.defaultDurationTicks
+			else -> 0
+		}
+
+		override fun set(index: Int, value: Int) = Unit
+
+		override fun getCount(): Int = 2
+	}
+
+	override fun getDisplayName(): Component = Component.translatable("block.${ShenzhiMod.MOD_ID}.transmutation_core")
+
+	override fun createMenu(containerId: Int, inventory: Inventory, player: Player): AbstractContainerMenu =
+		TransmutationCoreMenu(containerId, inventory, worldPosition)
+
+	override fun getScreenOpeningData(player: ServerPlayer): BlockPos = worldPosition
 
 	// ---- 持久化 ----
 

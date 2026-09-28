@@ -11,6 +11,13 @@
 
 按需求文档 §3.2 / §4.4 / §4.5 对齐实现，并修正三处"文档 vs 代码"不一致。
 
+### 新增
+
+- **转化核心 GUI**：空手右键打开界面，熔炉式布局——**左 = 输入、箭头上方 = 催化剂、右 = 产物**，箭头本身就是 10 秒进度条（按进度生长）。
+  - 26.1 的界面绘制改成了"抽取式"管线（重写 `extractBackground` + `GuiGraphicsExtractor` 的 `blit`/`blitSprite`），旧版 `renderBg(GuiGraphics, …)` 已不存在；
+  - `MenuType` 构造在 26.1 是私有的，因此菜单类型走 Fabric 的 `ExtendedMenuType` + `ExtendedMenuProvider`，把方块坐标随开屏包同步给客户端；
+  - 界面**暂时复用原版熔炉贴图与进度精灵**，所以不需要先做 GUI 贴图；将来换专属贴图只要替换 `TransmutationCoreScreen` 里的两个常量。
+
 ### 修复
 
 - **合成龙首：凑齐材料也永远合不出核心** —— 账本键与合成需求的键格式不一致（账本存 `compressed_wheat`，需求写成 `shenzhimod:compressed_wheat`），已统一为账本键。

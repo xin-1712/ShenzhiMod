@@ -10,6 +10,7 @@ import com.xin.shenzhimod.registry.ModBlockEntities
 import com.xin.shenzhimod.registry.ModBlocks
 import com.xin.shenzhimod.registry.ModCreativeTabs
 import com.xin.shenzhimod.registry.ModItems
+import com.xin.shenzhimod.registry.ModMenus
 import com.xin.shenzhimod.registry.ModSounds
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader
@@ -41,6 +42,7 @@ object ShenzhiMod : ModInitializer {
 		ModItems.bootstrap()
 		ModBlockEntities.bootstrap()
 		ModSounds.ALL
+		ModMenus.bootstrap()
 		ModCreativeTabs.bootstrap()
 
 		registerDataTableReloader()
