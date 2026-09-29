@@ -39,11 +39,9 @@ class TransmutationCoreScreen(
 		// 所以用界面底色把它们盖掉，免得玩家以为还能放燃料。
 		graphics.fill(xo + 55, yo + 35, xo + 75, yo + 71, GUI_BACKGROUND)
 
-		// 催化剂槽：原版熔炉背景这个位置没有槽位框，自己画一个
-		val slotX = xo + TransmutationCoreMenu.CATALYST_X
-		val slotY = yo + TransmutationCoreMenu.CATALYST_Y
-		graphics.fill(slotX - 1, slotY - 1, slotX + 17, slotY + 17, SLOT_BORDER)
-		graphics.fill(slotX, slotY, slotX + 16, slotY + 16, SLOT_INNER)
+		// 输入槽与催化剂槽所在的位置在熔炉贴图里没有槽位框，自己画
+		drawSlotFrame(graphics, xo + TransmutationCoreMenu.INPUT_X, yo + TransmutationCoreMenu.INPUT_Y)
+		drawSlotFrame(graphics, xo + TransmutationCoreMenu.CATALYST_X, yo + TransmutationCoreMenu.CATALYST_Y)
 
 		// 进度箭头：宽度按进度增长
 		val progressWidth = Mth.ceil(menu.progressFraction() * TransmutationCoreMenu.ARROW_WIDTH.toFloat())
@@ -64,6 +62,11 @@ class TransmutationCoreScreen(
 	}
 
 	private companion object {
+		fun drawSlotFrame(graphics: GuiGraphicsExtractor, x: Int, y: Int) {
+			graphics.fill(x - 1, y - 1, x + 17, y + 17, SLOT_BORDER)
+			graphics.fill(x, y, x + 16, y + 16, SLOT_INNER)
+		}
+
 		val BACKGROUND: Identifier = Identifier.withDefaultNamespace("textures/gui/container/furnace.png")
 		val ARROW_SPRITE: Identifier = Identifier.withDefaultNamespace("container/furnace/burn_progress")
 

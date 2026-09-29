@@ -129,7 +129,18 @@ class TransmutationCoreBlockEntity(pos: BlockPos, state: BlockState) :
 		setChanged()
 	}
 
-	override fun canPlaceItem(slot: Int, itemStack: ItemStack): Boolean = slot != SLOT_OUTPUT
+	/** 催化剂槽只接受"配方里出现过的催化剂"；输出槽谁都不能放。 */
+	override fun canPlaceItem(slot: Int, itemStack: ItemStack): Boolean = when (slot) {
+		SLOT_OUTPUT -> false
+		SLOT_CATALYST -> isCatalyst(itemStack)
+		else -> true
+	}
+
+	/** 该物品是不是本模组转化配方认可的催化剂。 */
+	fun isCatalyst(itemStack: ItemStack): Boolean {
+		val id = ItemStacks.idOf(itemStack) ?: return false
+		return ShenzhiTables.transmutation.isCatalyst(id)
+	}
 
 	// ---- WorldlyContainer（漏斗语义） ----
 
@@ -144,8 +155,8 @@ class TransmutationCoreBlockEntity(pos: BlockPos, state: BlockState) :
 		return when (direction) {
 			Direction.UP -> slot == SLOT_INPUT
 			Direction.DOWN -> false
-			null -> slot != SLOT_OUTPUT
-			else -> slot == SLOT_CATALYST
+			null -> slot != SLOT_OUTPUT && (slot != SLOT_CATALYST || isCatalyst(itemStack))
+			else -> slot == SLOT_CATALYST && isCatalyst(itemStack)
 		}
 	}
 

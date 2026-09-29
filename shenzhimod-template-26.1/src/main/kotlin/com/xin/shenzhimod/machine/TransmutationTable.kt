@@ -25,6 +25,12 @@ class TransmutationTable(entries: List<TransmutationEntry>) {
 
 	fun entryForInput(inputItemId: String): TransmutationEntry? = byInput[inputItemId]
 
+	/**
+	 * 该物品是否可以作为**催化剂**使用（出现在任意一条配方里）。
+	 * 催化剂槽据此限制放入的物品——不是什么都能塞进去。
+	 */
+	fun isCatalyst(itemId: String): Boolean = entries.any { it.catalystItemId == itemId }
+
 	/** 数据表自检：返回问题列表（空表示健康）。 */
 	fun validate(): List<String> {
 		val problems = mutableListOf<String>()

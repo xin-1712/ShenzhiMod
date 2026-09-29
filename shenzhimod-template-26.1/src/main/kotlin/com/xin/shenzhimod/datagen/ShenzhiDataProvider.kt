@@ -22,7 +22,24 @@ class ShenzhiDataProvider(packOutput: FabricPackOutput) :
 		entries["data/${ShenzhiMod.MOD_ID}/shenzhi_table/transmutation/default.json"] = transmutationTable()
 		entries["data/${ShenzhiMod.MOD_ID}/enchantment/totem_cooldown.json"] = totemCooldownEnchantment()
 		entries["data/${ShenzhiMod.MOD_ID}/enchantment/flight.json"] = flightEnchantment()
+		entries["data/${ShenzhiMod.MOD_ID}/tags/damage_type/creation_core_immune.json"] = creationCoreImmuneTag()
 		return entries
+	}
+
+	/**
+	 * 创世核心的伤害免疫标签：防火 + 防雷击。
+	 *
+	 * 需求 §4.5 要求"防火、防岩浆、防雷击"；祭坛完工时会真实落雷，
+	 * 产物必须免疫雷击才不会被当场劈没。这里用自定义标签而不是在代码里写死，
+	 * 以后想追加免疫类型（例如爆炸）只改这个数据文件。
+	 */
+	private fun creationCoreImmuneTag(): JsonObject {
+		val values = JsonArray()
+		values.add("#minecraft:is_fire")
+		values.add("#minecraft:is_lightning")
+		val root = JsonObject()
+		root.add("values", values)
+		return root
 	}
 
 	private fun compressionTable(): JsonObject {

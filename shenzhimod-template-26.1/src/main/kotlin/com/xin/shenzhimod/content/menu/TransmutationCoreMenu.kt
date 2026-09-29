@@ -52,7 +52,7 @@ class TransmutationCoreMenu(
 
 	init {
 		addSlot(Slot(container, SLOT_INPUT, INPUT_X, INPUT_Y))
-		addSlot(Slot(container, SLOT_CATALYST, CATALYST_X, CATALYST_Y))
+		addSlot(CatalystSlot(container, SLOT_CATALYST, CATALYST_X, CATALYST_Y))
 		addSlot(Slot(container, SLOT_OUTPUT, OUTPUT_X, OUTPUT_Y))
 
 		// 玩家背包 3×9
@@ -98,9 +98,9 @@ class TransmutationCoreMenu(
 	}
 
 	companion object {
-		/** 槽位坐标（与 176×166 的熔炉式背景对齐）。 */
+		/** 槽位坐标（与 176×166 的熔炉式背景对齐）。输入槽与产物槽都在箭头的水平中线上。 */
 		const val INPUT_X = 56
-		const val INPUT_Y = 17
+		const val INPUT_Y = 35
 
 		/** 箭头上方：催化剂。 */
 		const val CATALYST_X = 79
@@ -120,5 +120,16 @@ class TransmutationCoreMenu(
 		private const val DATA_PROGRESS = 0
 		private const val DATA_DURATION = 1
 		private const val DATA_COUNT = 2
+	}
+
+	/**
+	 * 催化剂槽：只允许放入转化配方里出现过的催化剂。
+	 * 放在 Slot 层是为了让**客户端**也拒绝（不只是服务端校验），鼠标拖入时就会弹回。
+	 */
+	private class CatalystSlot(container: Container, index: Int, x: Int, y: Int) : Slot(container, index, x, y) {
+		override fun mayPlace(stack: ItemStack): Boolean {
+			val id = com.xin.shenzhimod.util.ItemStacks.idOf(stack) ?: return false
+			return com.xin.shenzhimod.data.ShenzhiTables.transmutation.isCatalyst(id)
+		}
 	}
 }
