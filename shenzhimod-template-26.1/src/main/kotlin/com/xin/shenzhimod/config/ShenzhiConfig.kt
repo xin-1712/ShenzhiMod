@@ -88,8 +88,13 @@ data class AltarSection(
 	var baseBlockId: String = "minecraft:netherite_block",
 	/** 已就绪的核心在祭坛附近是否免疫 5 分钟消失（§4.5 风险 1）。 */
 	var protectReadyCoresFromDespawn: Boolean = true,
-	/** 中断时是否落雷（视觉专用，不破坏方块）。 */
+	/** 中断时是否落雷（落雷是否造成真实效果由 [realLightning] 决定）。 */
 	var strikeLightningOnAbort: Boolean = true,
+	/**
+	 * 落雷是否造成**真实效果**（伤害实体 + 在落点引燃）。
+	 * 默认 `true`（实测反馈：雷电只有特效不够）；改成 `false` 则退回纯视觉落雷。
+	 */
+	var realLightning: Boolean = true,
 	/** 融合产物。 */
 	var outputItemId: String = "shenzhimod:creation_core",
 	/** 产物数量。 */

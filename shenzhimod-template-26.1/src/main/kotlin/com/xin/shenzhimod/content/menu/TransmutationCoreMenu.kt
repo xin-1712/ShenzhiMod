@@ -32,8 +32,20 @@ class TransmutationCoreMenu(
 	private val corePos: BlockPos,
 ) : AbstractContainerMenu(ModMenus.TRANSMUTATION_CORE, containerId) {
 
+	/**
+	 * ⚠️ **只有服务端才去绑定真实方块实体**。
+	 *
+	 * 客户端如果也去读方块实体，就会读到"客户端那份永远不会更新的进度"（方块实体没有增量同步），
+	 * 界面上的箭头就会一直是 0——这是实测踩到的坑。
+	 * 原版熔炉也是同样处理：客户端用占位容器 + 由包同步的 [SimpleContainerData]，
+	 * 槽位里的物品由原版菜单的槽位同步机制填充。
+	 */
 	private val core: TransmutationCoreBlockEntity? =
-		playerInventory.player.level().getBlockEntity(corePos) as? TransmutationCoreBlockEntity
+		if (playerInventory.player.level().isClientSide) {
+			null
+		} else {
+			playerInventory.player.level().getBlockEntity(corePos) as? TransmutationCoreBlockEntity
+		}
 
 	private val container: Container = core ?: SimpleContainer(SLOT_COUNT)
 	private val data: ContainerData = core?.createContainerData() ?: SimpleContainerData(DATA_COUNT)

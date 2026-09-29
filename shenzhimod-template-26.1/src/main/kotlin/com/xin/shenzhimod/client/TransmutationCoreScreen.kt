@@ -35,6 +35,10 @@ class TransmutationCoreScreen(
 		// 背景（原版熔炉界面，占位）
 		graphics.blit(RenderPipelines.GUI_TEXTURED, BACKGROUND, xo, yo, 0.0f, 0.0f, imageWidth, imageHeight, 256, 256)
 
+		// 熔炉贴图自带"下方燃料槽 + 火焰轮廓"，本机只有两个输入（物品 + 催化剂），
+		// 所以用界面底色把它们盖掉，免得玩家以为还能放燃料。
+		graphics.fill(xo + 55, yo + 35, xo + 75, yo + 71, GUI_BACKGROUND)
+
 		// 催化剂槽：原版熔炉背景这个位置没有槽位框，自己画一个
 		val slotX = xo + TransmutationCoreMenu.CATALYST_X
 		val slotY = yo + TransmutationCoreMenu.CATALYST_Y
@@ -66,5 +70,8 @@ class TransmutationCoreScreen(
 		/** 原版物品槽的配色：外深内浅。 */
 		const val SLOT_BORDER = 0xFF373737.toInt()
 		const val SLOT_INNER = 0xFF8B8B8B.toInt()
+
+		/** 原版容器界面的标准底色（用于盖掉熔炉贴图里多余的燃料槽与火焰轮廓）。 */
+		const val GUI_BACKGROUND = 0xFFC6C6C6.toInt()
 	}
 }

@@ -82,7 +82,7 @@ class UltimateAltarBlockEntity(pos: BlockPos, state: BlockState) :
 
 			AltarEvent.Aborted -> {
 				setChanged()
-				strikeVisualLightning(level, pos)
+				strikeLightning(level, pos)
 				level.playSound(null, pos.x + 0.5, pos.y + 0.5, pos.z + 0.5, SoundEvents.ENDER_DRAGON_HURT, SoundSource.BLOCKS, 1.0f, 0.7f)
 			}
 
@@ -129,7 +129,7 @@ class UltimateAltarBlockEntity(pos: BlockPos, state: BlockState) :
 
 	/** 融合完成：落雷 + 龙吼 + 大爆发（落雷为视觉专用，不破坏方块、不引燃）。 */
 	private fun playCompletionEffects(level: ServerLevel, pos: BlockPos) {
-		strikeVisualLightning(level, pos)
+		strikeLightning(level, pos)
 		val cx = pos.x + 0.5
 		val cy = pos.y + 1.5
 		val cz = pos.z + 0.5
@@ -221,11 +221,17 @@ class UltimateAltarBlockEntity(pos: BlockPos, state: BlockState) :
 		fusion.reset()
 	}
 
-	/** 视觉落雷：不破坏方块、不引燃（`isVisualOnly`）。 */
-	private fun strikeVisualLightning(level: ServerLevel, pos: BlockPos) {
+	/**
+	 * 落雷。
+	 *
+	 * 需求原稿要求"不破坏、不引燃"（视觉专用），实测后按反馈改为**真实落雷**：
+	 * 有伤害、在落点引燃（配置项 `altar.realLightning` 可切回纯视觉）。
+	 * 落雷在产出之前发生，且三核心与创世核心都是防火物品，不会被雷击毁掉。
+	 */
+	private fun strikeLightning(level: ServerLevel, pos: BlockPos) {
 		if (!ShenzhiMod.config.altar.strikeLightningOnAbort) return
 		val bolt = LightningBolt(EntityType.LIGHTNING_BOLT, level)
-		bolt.setVisualOnly(true)
+		bolt.setVisualOnly(!ShenzhiMod.config.altar.realLightning)
 		bolt.setPos(pos.x + 0.5, pos.y.toDouble(), pos.z + 0.5)
 		level.addFreshEntity(bolt)
 	}
