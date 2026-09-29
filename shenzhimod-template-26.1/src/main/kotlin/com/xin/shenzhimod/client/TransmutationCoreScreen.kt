@@ -35,9 +35,10 @@ class TransmutationCoreScreen(
 		// 背景（原版熔炉界面，占位）
 		graphics.blit(RenderPipelines.GUI_TEXTURED, BACKGROUND, xo, yo, 0.0f, 0.0f, imageWidth, imageHeight, 256, 256)
 
-		// 熔炉贴图自带"下方燃料槽 + 火焰轮廓"，本机只有两个输入（物品 + 催化剂），
-		// 所以用界面底色把它们盖掉，免得玩家以为还能放燃料。
-		graphics.fill(xo + 55, yo + 35, xo + 75, yo + 71, GUI_BACKGROUND)
+		// 熔炉贴图在左列自带了三个"零件"：左上输入槽、中间火焰轮廓、下方燃料槽。
+		// 本机只有两个输入（物品 + 催化剂）且输入槽在箭头左侧，所以把**整条左列**用界面底色盖掉，
+		// 再自己画两个槽位框——否则会留下一堆用不了的假槽位（这是实测反馈）。
+		graphics.fill(xo + 55, yo + 16, xo + 75, yo + 72, GUI_BACKGROUND)
 
 		// 输入槽与催化剂槽所在的位置在熔炉贴图里没有槽位框，自己画
 		drawSlotFrame(graphics, xo + TransmutationCoreMenu.INPUT_X, yo + TransmutationCoreMenu.INPUT_Y)
