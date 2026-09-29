@@ -3,16 +3,20 @@ package com.xin.shenzhimod.anvil
 /**
  * 核心附魔判定（纯逻辑）。
  *
- * 输入是"左槽物品 ID + 它命中的标签 + 右槽物品 ID + 目标已有的该附魔等级"，
+ * 输入是"左槽物品 ID + 它命中的标签 + 右槽物品 ID + 目标已有的附魔等级表"，
  * 输出是"该不该产出、产出什么、成本多少"。
  * Mixin 适配层只负责把 `ItemStack` 翻译成 [CoreEnchantRequest]，以及把
  * [CoreEnchantDecision] 写回原版容器——判定本身完全可单测。
+ *
+ * 与"原版互斥附魔"（§8-G9）有关的判定不在这里：它需要真正的 `Holder<Enchantment>` 与
+ * `Enchantment.areCompatible`，属于适配层的活（见 `interaction/AnvilEnchantHandler.kt`）。
  */
 data class CoreEnchantRequest(
 	val targetItemId: String,
 	val targetTags: Set<String>,
 	val mediaItemId: String,
-	val currentEnchantLevel: Int,
+	/** 目标当前已有的附魔：附魔 ID → 等级（没有的附魔即 0）。 */
+	val currentLevels: Map<String, Int>,
 )
 
 sealed interface CoreEnchantDecision {
@@ -29,23 +33,21 @@ sealed interface CoreEnchantDecision {
 object CoreEnchantResolver {
 	/**
 	 * @param rules 规则表（由配置生成）
-	 * @param respectExclusivity 是否遵守原版互斥（§8-G9 默认遵守）；为 true 时，
-	 *        目标身上已存在互斥附魔也会交给原版处理（此处只做"是否产出"的判断，
-	 *        互斥的实际拦截由原版铁砧逻辑负责，我们只保证不绕过它）。
 	 */
 	fun resolve(
 		request: CoreEnchantRequest,
 		rules: List<CoreEnchantRule>,
-		respectExclusivity: Boolean,
 	): CoreEnchantDecision {
 		val candidates = rules.filter { it.mediaItemId == request.mediaItemId }
 		if (candidates.isEmpty()) return CoreEnchantDecision.NotApplicable
 
 		for (rule in candidates) {
 			if (!matchesTarget(rule, request)) continue
-			val targetLevel = minOf(rule.grantedLevel, request.currentEnchantLevel + 1)
-			if (targetLevel <= request.currentEnchantLevel) {
-				return CoreEnchantDecision.AlreadyAtLeast(rule.enchantmentId, request.currentEnchantLevel)
+			val current = request.currentLevels[rule.enchantmentId] ?: 0
+			// §4.6："同种附魔取更高等级，上限 grantedLevel" —— 已有 V 级也直接抬到 X 级。
+			val targetLevel = maxOf(current, rule.grantedLevel)
+			if (targetLevel <= current) {
+				return CoreEnchantDecision.AlreadyAtLeast(rule.enchantmentId, current)
 			}
 			return CoreEnchantDecision.Apply(rule.id, rule.enchantmentId, targetLevel, rule.costLevels)
 		}

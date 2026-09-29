@@ -10,8 +10,8 @@ package com.xin.shenzhimod.anvil
  * - 类型不匹配不产出结果；
  * - 只拦截"右槽是本模组核心"的分支，其余交互走原版。
  *
- * 这里只用字符串表示物品与标签，真正解析 `TagKey` 的工作在适配层完成，
- * 这样规则表可以脱离 Minecraft 单独测试。
+ * 这里只用字符串表示物品与标签，真正解析 `TagKey` / `Holder<Enchantment>` 的工作在适配层
+ * （`interaction/AnvilEnchantHandler.kt`）完成，这样规则表可以脱离 Minecraft 单独测试。
  */
 data class CoreEnchantRule(
 	/** 规则名，用于日志与数据生成。 */
@@ -39,7 +39,27 @@ object CoreEnchantDefaults {
 	const val ENCHANT_TOTEM_COOLDOWN = "shenzhimod:totem_cooldown"
 	const val ENCHANT_FLIGHT = "shenzhimod:flight"
 
-	fun build(coreCostLevels: Int, creationCoreCostLevels: Int, grantedLevel: Int): List<CoreEnchantRule> = listOf(
+	/** 所有媒介物品 ID：用于"右槽是不是本模组核心"的快速判断（服务端与客户端都要用）。 */
+	val MEDIA_ITEM_IDS: Set<String> = setOf(AGRICULTURE_CORE, MINERAL_CORE, COMBAT_CORE, CREATION_CORE)
+
+	/**
+	 * 目标类型一律用**原版物品标签**表达（§6.3-F：用标签而非硬编码物品），
+	 * 而且直接复用原版附魔 JSON 里的 `supported_items` 标签——这样"原版能附这个附魔的物品"
+	 * 与"核心附魔接受的物品"永远一致（含今后原版新增的武器类型，例如 26.1 的矛）：
+	 * - 锋利 → `#minecraft:enchantable/sharp_weapon`（剑 / 矛 / 斧）
+	 * - 效率 → `#minecraft:enchantable/mining`（镐 / 斧 / 锹 / 锄 / 剪刀）
+	 * - 时运 → `#minecraft:enchantable/mining_loot`（镐 / 斧 / 锹 / 锄）
+	 * - 冷却 / 飞行 → 单个物品 ID（原版没有"可附冷却/飞行的物品"标签）
+	 *
+	 * 等级按附魔分别配置：锋利的等级要能把"下界合金剑跳劈"抬过 20 点，效率/时运按需另调。
+	 */
+	fun build(
+		coreCostLevels: Int,
+		creationCoreCostLevels: Int,
+		sharpnessLevel: Int,
+		efficiencyLevel: Int,
+		fortuneLevel: Int,
+	): List<CoreEnchantRule> = listOf(
 		CoreEnchantRule(
 			id = "sharpness_from_combat_core",
 			mediaItemId = COMBAT_CORE,
@@ -47,7 +67,7 @@ object CoreEnchantDefaults {
 			targetItemIds = emptySet(),
 			enchantmentId = "minecraft:sharpness",
 			costLevels = coreCostLevels,
-			grantedLevel = grantedLevel,
+			grantedLevel = sharpnessLevel,
 		),
 		CoreEnchantRule(
 			id = "efficiency_from_mineral_core",
@@ -56,7 +76,7 @@ object CoreEnchantDefaults {
 			targetItemIds = emptySet(),
 			enchantmentId = "minecraft:efficiency",
 			costLevels = coreCostLevels,
-			grantedLevel = grantedLevel,
+			grantedLevel = efficiencyLevel,
 		),
 		CoreEnchantRule(
 			id = "fortune_from_agriculture_core",
@@ -65,7 +85,7 @@ object CoreEnchantDefaults {
 			targetItemIds = emptySet(),
 			enchantmentId = "minecraft:fortune",
 			costLevels = coreCostLevels,
-			grantedLevel = grantedLevel,
+			grantedLevel = fortuneLevel,
 		),
 		CoreEnchantRule(
 			id = "totem_cooldown_from_combat_core",

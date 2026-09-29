@@ -107,8 +107,21 @@ data class CoreEnchantSection(
 	var coreCostLevels: Int = 100,
 	/** 创世核心附魔的固定经验等级成本。 */
 	var creationCoreCostLevels: Int = 200,
-	/** 写入的附魔等级（可超过原版上限）。 */
-	var grantedLevel: Int = 10,
+	/**
+	 * 锋利写入的等级（可超过原版上限 5）。
+	 *
+	 * 默认 **17**，目标是"下界合金剑 + 跳劈（暴击）一击带走 20 血的无装备普通僵尸"。推算过程（26.1 实测公式）：
+	 * - 下界合金剑攻击力 = 1（玩家基础）+ 4（下界合金加成）+ 3（剑本身）= **8**；
+	 * - 暴击只放大**基础**伤害（×1.5 → 12），锋利加成走 `magicBoost`、**不**被暴击放大；
+	 * - 锋利伤害加成 = `0.5 × 等级 + 0.5`（附魔 JSON 的 linear：base 1.0 / per_level_above_first 0.5）；
+	 * - 蓄力满但未到 100% 时 `attackStrengthScale` 略高于 0.9，取最坏值 0.9：
+	 *   `12 + 0.9 × (0.5 × 17 + 0.5) = 12 + 8.1 = 20.1 ≥ 20` ✔（16 级只有 19.65，不够稳）。
+	 */
+	var sharpnessLevel: Int = 17,
+	/** 效率写入的等级（可超过原版上限 5）。原版加成随等级平方增长，默认维持 10。 */
+	var efficiencyLevel: Int = 10,
+	/** 时运写入的等级（可超过原版上限 3）。默认维持 10。 */
+	var fortuneLevel: Int = 10,
 	/** 创造模式是否消耗媒介（§8-G12：消耗核心、不消耗经验）。 */
 	var creativeConsumesCore: Boolean = true,
 	/** 创造模式是否消耗经验（§8-G12：不消耗）。 */
@@ -146,8 +159,22 @@ data class FlightSection(
 	var sprintFlyingSpeed: Double = 0.0258,
 	/** 是否把移动速度属性与速度类状态效果计入飞行速度。 */
 	var applyMovementSpeedAttributes: Boolean = true,
-	/** 是否在穿戴飞行鞘翅时禁用原版滑翔，避免"滑翔/飞行"抖动。 */
-	var disableElytraGlideWhileFlying: Boolean = true,
+	/*
+	 * 曾经的 `disableElytraGlideWhileFlying` 已删除（2026-09-29）：
+	 * 滑翔**始终允许**，与创造模式一致（既能双击空格飞行，也能在空中按一次空格开始滑翔）。
+	 * 之所以彻底去掉开关而不是留个默认 false 的字段：配置是"深度合并"的，
+	 * 旧配置文件里残留的 `true` 会一直生效，反而让人以为改动没生效。
+	 */
+	/** 飞行时是否消耗鞘翅耐久（与原版滑翔一致；创造模式因"无限材料"天然不消耗）。 */
+	var consumeElytraDurability: Boolean = true,
+	/**
+	 * 飞行时每多少 tick 消耗 1 点鞘翅耐久。
+	 *
+	 * 默认 **20 tick = 1 秒/点**，与原版滑翔的消耗速率完全一致：
+	 * 432 点耐久的鞘翅 ≈ **连续飞行 7.2 分钟**；附魔耐久 III 大约延长到 4 倍（约 28.8 分钟）；
+	 * 经验修补会在拾取经验时正常修复（与滑翔一样，走原版耐久流程）。
+	 */
+	var durabilityTicksPerDamage: Int = 20,
 )
 
 /** 客户端表现（粒子/音效）开关。 */
@@ -158,4 +185,10 @@ data class VisualSection(
 	var particleDensity: Double = 0.5,
 	/** 全局机器音效开关。 */
 	var soundsEnabled: Boolean = true,
+	/**
+	 * 下界之星碎片碎裂粒子颜色（`RRGGBB`，可带 `#`）。
+	 *
+	 * 默认 `E0D5FF`：贴近下界之星的"白中带紫"。改错了会回退到该默认值并写一条警告日志。
+	 */
+	var netherStarShardParticleColor: String = "E0D5FF",
 )

@@ -2,6 +2,7 @@ package com.xin.shenzhimod.registry
 
 import com.xin.shenzhimod.ShenzhiMod
 import com.xin.shenzhimod.content.item.CompressedItem
+import com.xin.shenzhimod.content.item.NetherStarShardItem
 import com.xin.shenzhimod.machine.CompressionDefaults
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.Registries
@@ -33,7 +34,8 @@ object ModItems {
 	val LIMESTONE: Item = ModRegistry.item("limestone") { Item(it.stacksTo(64)) }
 
 	// ---- 投掷物材料（模块 H） ----
-	val NETHER_STAR_SHARD: Item = ModRegistry.item("nether_star_shard") { Item(it.stacksTo(64).fireResistant()) }
+	/** 右键直接投掷，参数对齐附魔之瓶；堆叠 64、防火（§4.8）。 */
+	val NETHER_STAR_SHARD: NetherStarShardItem = ModRegistry.item("nether_star_shard") { NetherStarShardItem(it.stacksTo(64).fireResistant()) }
 
 	// ---- 四核心（模块 B/E） ----
 	val AGRICULTURE_CORE: Item = ModRegistry.item("agriculture_core") { Item(it.stacksTo(64).fireResistant().rarity(Rarity.RARE)) }

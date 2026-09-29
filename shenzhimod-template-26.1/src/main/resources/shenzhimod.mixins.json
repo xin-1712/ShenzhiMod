@@ -3,7 +3,15 @@
 	"package": "com.xin.shenzhimod.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"mixins": [
-		"SpawnPlacementsGetPlacementTypeMixin"
+		"SpawnPlacementsGetPlacementTypeMixin",
+		"ItemCombinerMenuAccessor",
+		"AnvilMenuMixin",
+		"LivingEntityTotemCooldownMixin",
+		"PlayerFlightMixin"
+	],
+	"client": [
+		"AnvilScreenMixin",
+		"ClientPacketListenerMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

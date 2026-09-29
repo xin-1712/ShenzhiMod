@@ -5,14 +5,20 @@ import com.xin.shenzhimod.config.ShenzhiConfig
 import com.xin.shenzhimod.data.ShenzhiTables
 import com.xin.shenzhimod.entity.PiglinBruteSpawnRules
 import com.xin.shenzhimod.interaction.AnvilCompressionHandler
+import com.xin.shenzhimod.interaction.AnvilEnchantHandler
+import com.xin.shenzhimod.interaction.FlightEnchantService
+import com.xin.shenzhimod.interaction.TotemCooldownService
 import com.xin.shenzhimod.loot.ModLootTables
+import com.xin.shenzhimod.network.TotemTriggerPayload
 import com.xin.shenzhimod.registry.ModBlockEntities
 import com.xin.shenzhimod.registry.ModBlocks
 import com.xin.shenzhimod.registry.ModCreativeTabs
+import com.xin.shenzhimod.registry.ModEntities
 import com.xin.shenzhimod.registry.ModItems
 import com.xin.shenzhimod.registry.ModMenus
 import com.xin.shenzhimod.registry.ModSounds
 import net.fabricmc.api.ModInitializer
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader
 import net.minecraft.resources.Identifier
 import net.minecraft.server.packs.PackType
@@ -40,15 +46,20 @@ object ShenzhiMod : ModInitializer {
 
 		ModBlocks.bootstrap()
 		ModItems.bootstrap()
+		ModEntities.bootstrap()
 		ModBlockEntities.bootstrap()
 		ModSounds.ALL
 		ModMenus.bootstrap()
 		ModCreativeTabs.bootstrap()
 
+		AnvilEnchantHandler.rebuildFromConfig(config)
+		registerPayloads()
 		registerDataTableReloader()
 		AnvilCompressionHandler.register()
 		ModLootTables.register()
 		PiglinBruteSpawnRules.register()
+		FlightEnchantService.register()
+		TotemCooldownService.register()
 
 		logger.info(
 			"ShenzhiMod 初始化完成：{} 个物品 / {} 个方块 / {} 条压缩配方",
@@ -56,6 +67,11 @@ object ShenzhiMod : ModInitializer {
 			ModBlocks.ALL.size,
 			ShenzhiTables.compression.entries.size,
 		)
+	}
+
+	/** 自定义包注册。目前只有"免死动画该显示哪只手"这一个（模块 G，服务端 → 客户端）。 */
+	private fun registerPayloads() {
+		PayloadTypeRegistry.clientboundPlay().register(TotemTriggerPayload.TYPE, TotemTriggerPayload.CODEC)
 	}
 
 	/**

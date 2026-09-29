@@ -43,6 +43,13 @@ class ModLanguageProvider(
 		builder.add("tooltip.shenzhimod.compressed", text.tooltipCompressed)
 		builder.add("enchantment.shenzhimod.totem_cooldown", text.enchantTotemCooldown)
 		builder.add("enchantment.shenzhimod.flight", text.enchantFlight)
+		// 附魔等级的罗马数字（§8.2-V2）：原版只提供 1~10（level.10 = "X"），而本模组的
+		// 锋利默认写到 17 级（配置 coreEnchant.sharpnessLevel），所以这里把 1~20 都补齐，
+		// 保证"锋利 XVII"在任何语言下都显示成罗马数字，而不是裸的语言键。
+		// 两种语言的取值相同（罗马数字），故不放进 Texts。
+		for (level in 1..20) {
+			builder.add("enchantment.level.$level", ROMAN_NUMERALS[level - 1])
+		}
 		builder.add("message.shenzhimod.dragon_head.status", text.dragonHeadStatus)
 		builder.add("message.shenzhimod.dragon_head.crafting", text.dragonHeadCrafting)
 		builder.add("message.shenzhimod.altar.idle", text.altarIdle)
@@ -76,6 +83,12 @@ class ModLanguageProvider(
 	)
 
 	private companion object {
+		/** 1~20 的罗马数字。 */
+		val ROMAN_NUMERALS = listOf(
+			"I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X",
+			"XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX",
+		)
+
 		val EN = Texts(
 			limestone = "Limestone",
 			netherStarShard = "Nether Star Shard",
@@ -88,7 +101,7 @@ class ModLanguageProvider(
 			ultimateAltar = "Ultimate Altar",
 			tabMain = "ShenzhiMod",
 			tooltipCompressed = "Compressed from %s x %s",
-			enchantTotemCooldown = "Totem Cooldown",
+			enchantTotemCooldown = "Cooldown",
 			enchantFlight = "Flight",
 			dragonHeadStatus = "Stored %s / %s kinds of compressed items",
 			dragonHeadCrafting = "Crafting %s (progress %s)",
@@ -111,7 +124,7 @@ class ModLanguageProvider(
 			ultimateAltar = "终极祭坛",
 			tabMain = "深之模组",
 			tooltipCompressed = "由 %s 个 %s 压缩而成",
-			enchantTotemCooldown = "不死图腾冷却",
+			enchantTotemCooldown = "冷却",
 			enchantFlight = "飞行",
 			dragonHeadStatus = "已吸收 %s / %s 种压缩态",
 			dragonHeadCrafting = "正在合成 %s（进度 %s）",
