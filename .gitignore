@@ -1,5 +1,6 @@
 # --- Gradle / Loom ---
 .gradle/
+.kotlin/
 build/
 out/
 *.iml

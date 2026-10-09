@@ -24,8 +24,8 @@ SOFTWARE.
 
 ## Third-party attribution / 第三方归属
 
-本项目在实现"堡垒遗迹内猪灵蛮兵刷怪"（需求文档 §6.7 / §6.8）时，参考并移植了
-以下 MIT 许可项目的规则参数与生成谓词逻辑：
+本项目在实现"堡垒遗迹内猪灵蛮兵刷怪"时，参考并移植了以下 MIT 许可项目的
+规则参数与生成谓词逻辑：
 
 - **Carpet Mod** (fabric-carpet) — MIT License — https://github.com/gnembon/fabric-carpet
 - **Carpet Sky Additions** — MIT License, Copyright (c) 2021-2023 Jack Sorrell
