@@ -1,7 +1,16 @@
 {
   "variants": {
-    "": {
+    "state=idle": {
       "model": "shenzhimod:block/ultimate_altar"
+    },
+    "state=invalid": {
+      "model": "shenzhimod:block/ultimate_altar_invalid"
+    },
+    "state=ready": {
+      "model": "shenzhimod:block/ultimate_altar_ready"
+    },
+    "state=active": {
+      "model": "shenzhimod:block/ultimate_altar_active"
     }
   }
 }

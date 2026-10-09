@@ -1,6 +1,7 @@
 package com.xin.shenzhimod.content.blockentity
 
 import com.xin.shenzhimod.ShenzhiMod
+import com.xin.shenzhimod.content.block.TransmutationCoreBlock
 import com.xin.shenzhimod.content.menu.TransmutationCoreMenu
 import com.xin.shenzhimod.data.ShenzhiTables
 import com.xin.shenzhimod.machine.TransmutationEntry
@@ -22,6 +23,7 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.ContainerData
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.storage.ValueInput
@@ -50,6 +52,12 @@ class TransmutationCoreBlockEntity(pos: BlockPos, state: BlockState) :
 
 	fun serverTick(level: ServerLevel, pos: BlockPos, state: BlockState) {
 		val recipe = currentRecipe()
+		// 工作状态外观：输入与催化剂都匹配就把 lit 打开（方块状态自带客户端同步，
+		// 因此不需要额外发包，也不违反"状态服务端算"的约定）。
+		val lit = recipe != null
+		if (state.getValue(TransmutationCoreBlock.LIT) != lit) {
+			level.setBlock(pos, state.setValue(TransmutationCoreBlock.LIT, lit), Block.UPDATE_ALL)
+		}
 		if (process.tick(recipe) && recipe != null) {
 			finishCraft(recipe)
 		}
@@ -83,7 +91,10 @@ class TransmutationCoreBlockEntity(pos: BlockPos, state: BlockState) :
 			process.restore(recipe.id, recipe.durationTicks)
 			return
 		}
-		val space = existing.maxStackSize - existing.count
+		// ⚠️ 输出槽为空时 `ItemStack.EMPTY.maxStackSize` 是 **1**（不是 64），
+		// 曾经因此把"产出 4 个"的配方永久判成"放不下"：进度条能走完，但产物不写、输入也不扣。
+		// 所以空槽要按**产物自己**的最大堆叠数算空间。
+		val space = (if (existing.isEmpty) output.maxStackSize else existing.maxStackSize) - existing.count
 		if (space < recipe.outputCount) {
 			process.restore(recipe.id, recipe.durationTicks)
 			return

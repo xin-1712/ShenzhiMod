@@ -1,0 +1,35 @@
+{
+  "parent": "shenzhimod:compression",
+  "criteria": {
+    "has_item": {
+      "conditions": {
+        "items": [
+          {
+            "items": "shenzhimod:agriculture_core"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "frame": "goal",
+    "icon": {
+      "id": "shenzhimod:agriculture_core"
+    },
+    "title": {
+      "translate": "advancements.shenzhimod.core_agriculture.title"
+    },
+    "description": {
+      "translate": "advancements.shenzhimod.core_agriculture.description"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "requirements": [
+    [
+      "has_item"
+    ]
+  ]
+}

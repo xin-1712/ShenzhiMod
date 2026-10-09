@@ -1,0 +1,35 @@
+{
+  "parent": "shenzhimod:compression",
+  "criteria": {
+    "has_item": {
+      "conditions": {
+        "items": [
+          {
+            "items": "shenzhimod:combat_core"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "frame": "goal",
+    "icon": {
+      "id": "shenzhimod:combat_core"
+    },
+    "title": {
+      "translate": "advancements.shenzhimod.core_combat.title"
+    },
+    "description": {
+      "translate": "advancements.shenzhimod.core_combat.description"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "requirements": [
+    [
+      "has_item"
+    ]
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "parent": "shenzhimod:altar_base",
+  "criteria": {
+    "code": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "frame": "challenge",
+    "icon": {
+      "id": "shenzhimod:creation_core"
+    },
+    "title": {
+      "translate": "advancements.shenzhimod.creation_core.title"
+    },
+    "description": {
+      "translate": "advancements.shenzhimod.creation_core.description"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "requirements": [
+    [
+      "code"
+    ]
+  ]
+}

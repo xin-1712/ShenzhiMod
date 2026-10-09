@@ -58,17 +58,19 @@ object AnvilEnchantHandler {
 			coreCostLevels = section.coreCostLevels,
 			creationCoreCostLevels = section.creationCoreCostLevels,
 			sharpnessLevel = section.sharpnessLevel,
+			protectionLevel = section.protectionLevel,
 			efficiencyLevel = section.efficiencyLevel,
 			fortuneLevel = section.fortuneLevel,
 		)
 		respectVanillaExclusivity = section.respectVanillaExclusivity
 		writeRepairCost = section.writeRepairCost
 		ShenzhiMod.logger.info(
-			"核心附魔规则已载入 {} 条（基础成本 {} 级 / 创世核心 {} 级；锋利 {} 级 / 效率 {} 级 / 时运 {} 级）",
+			"核心附魔规则已载入 {} 条（基础成本 {} 级 / 创世核心 {} 级；锋利 {} 级 / 保护 {} 级 / 效率 {} 级 / 时运 {} 级）",
 			rules.size,
 			section.coreCostLevels,
 			section.creationCoreCostLevels,
 			section.sharpnessLevel,
+			section.protectionLevel,
 			section.efficiencyLevel,
 			section.fortuneLevel,
 		)
@@ -234,4 +236,5 @@ object AnvilEnchantHandler {
 		if (!isCoreMedia(menu.getSlot(AnvilMenu.ADDITIONAL_SLOT).item)) return false
 		return menu.getSlot(AnvilMenu.RESULT_SLOT).hasItem()
 	}
+
 }

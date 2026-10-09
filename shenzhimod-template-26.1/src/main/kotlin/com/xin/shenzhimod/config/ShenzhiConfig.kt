@@ -122,6 +122,20 @@ data class CoreEnchantSection(
 	var efficiencyLevel: Int = 10,
 	/** 时运写入的等级（可超过原版上限 3）。默认维持 10。 */
 	var fortuneLevel: Int = 10,
+	/**
+	 * 保护写入的等级（可超过原版上限 4），**只对胸甲生效**（`#minecraft:enchantable/chest_armor`）。
+	 *
+	 * 原版机制（26.1 源码核实）：
+	 * - 保护提供的减伤点数为 `等级 × 1`（附魔 JSON 的 `damage_protection` linear：base 1 / per_level_above_first 1）；
+	 * - 所有护甲上的保护点数**求和后统一封顶 20**，再按 `1 - 点数 / 25` 乘算（`CombatRules.getDamageAfterMagicAbsorb`），
+	 *   也就是**最高 80% 减伤，超过 20 级的点数完全浪费**；
+	 * - 换算：5 级 = 20%、8 级 = 32%、12 级 = 48%、16 级 = 64%（= 原版四件保护 IV 的总和）、20 级 = 80%（硬上限）。
+	 *
+	 * 默认 **12**：单件胸甲即 48% 减伤（约等于原版三件保护 IV），
+	 * 和胸甲之外的原版保护 IV（3 件 = 12 点）叠加后刚好贴近封顶，
+	 * 既明显强于原版、又不会把护甲附魔体系整体作废。想更暴力直接调到 16~20。
+	 */
+	var protectionLevel: Int = 12,
 	/** 创造模式是否消耗媒介（§8-G12：消耗核心、不消耗经验）。 */
 	var creativeConsumesCore: Boolean = true,
 	/** 创造模式是否消耗经验（§8-G12：不消耗）。 */
@@ -191,4 +205,13 @@ data class VisualSection(
 	 * 默认 `E0D5FF`：贴近下界之星的"白中带紫"。改错了会回退到该默认值并写一条警告日志。
 	 */
 	var netherStarShardParticleColor: String = "E0D5FF",
+	/**
+	 * 穿飞行附魔鞘翅**飞行时**（`abilities.flying`，与滑翔无关）的鞘翅扇动动画开关。
+	 *
+	 * 实现方式是客户端改写玩家渲染状态里的鞘翅翼角（原版 `ElytraModel` 会读它），
+	 * 让翅膀持续做小幅摆动——只影响表现，纯客户端，不参与判定。
+	 */
+	var elytraFlightAnimation: Boolean = true,
+	/** 飞行时是否在鞘翅两侧拖出粒子尾迹（跟随翅膀摆动，同样只在"飞行"状态触发）。 */
+	var elytraFlightTrailParticles: Boolean = true,
 )

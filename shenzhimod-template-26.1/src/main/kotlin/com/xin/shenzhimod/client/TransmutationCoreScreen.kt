@@ -62,6 +62,7 @@ class TransmutationCoreScreen(
 		}
 	}
 
+
 	private companion object {
 		fun drawSlotFrame(graphics: GuiGraphicsExtractor, x: Int, y: Int) {
 			graphics.fill(x - 1, y - 1, x + 17, y + 17, SLOT_BORDER)
@@ -77,5 +78,6 @@ class TransmutationCoreScreen(
 
 		/** 原版容器界面的标准底色（用于盖掉熔炉贴图里多余的燃料槽与火焰轮廓）。 */
 		const val GUI_BACKGROUND = 0xFFC6C6C6.toInt()
+
 	}
 }

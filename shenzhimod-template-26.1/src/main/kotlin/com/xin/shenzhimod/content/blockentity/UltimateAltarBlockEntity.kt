@@ -1,6 +1,8 @@
 package com.xin.shenzhimod.content.blockentity
 
 import com.xin.shenzhimod.ShenzhiMod
+import com.xin.shenzhimod.advancement.ModAdvancements
+import com.xin.shenzhimod.content.block.UltimateAltarBlock
 import com.xin.shenzhimod.machine.AltarEvent
 import com.xin.shenzhimod.machine.AltarFusionState
 import com.xin.shenzhimod.machine.AltarPhase
@@ -18,12 +20,14 @@ import net.minecraft.world.entity.LightningBolt
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.storage.ValueInput
 import net.minecraft.world.level.storage.ValueOutput
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
+import java.util.UUID
 
 /**
  * 终极祭坛的方块实体（模块 E）。
@@ -47,8 +51,25 @@ class UltimateAltarBlockEntity(pos: BlockPos, state: BlockState) :
 	private var baseCheckCooldown: Int = 0
 	private var effectTick: Int = 0
 
+	/** 放下祭坛的玩家（成就"地基打得牢"优先发给他），随存档持久化。 */
+	private var placerId: UUID? = null
+
+	/** "地基打得牢"是否已经发过；只发一次，避免每次区块加载都重复尝试。 */
+	private var baseAdvancementGranted: Boolean = false
+
+	/** Shift+右键启动融合的玩家（成就"天打雷劈"优先发给他），随存档持久化。 */
+	private var startedById: UUID? = null
+
 	fun markBaseDirty() {
 		baseCheckCooldown = 0
+	}
+
+	/** 由方块在 `setPlacedBy` 时登记"谁放的"，用于精准发放底座成就。 */
+	fun rememberPlacer(player: Player) {
+		if (placerId != player.uuid) {
+			placerId = player.uuid
+			setChanged()
+		}
 	}
 
 	fun serverTick(level: ServerLevel, pos: BlockPos, state: BlockState) {
@@ -59,17 +80,45 @@ class UltimateAltarBlockEntity(pos: BlockPos, state: BlockState) :
 			baseCheckCooldown = BASE_CHECK_INTERVAL_TICKS
 		}
 
+		// 成就"地基打得牢"：**底座第一次校验通过、贴图从"底座不正确"切走的那一刻**授予。
+		// 放在这里而不是"放置方块时"，是因为玩家通常先放祭坛、再补底座（也可能反过来）。
+		//
+		// 只在"刚重新校验完底座"的那一 tick 尝试（每秒一次）：正常情况下放下祭坛的玩家就在旁边，
+		// 一次就发出去；如果他刚好离线且附近没人，就先不写"已发放"标记，等有人在场的那一秒再发，
+		// 既不会把成就弄丢，也不会每 tick 扫一次实体。
+		if (baseCheckCooldown == BASE_CHECK_INTERVAL_TICKS && baseValid && !baseAdvancementGranted) {
+			val handled = ModAdvancements.awardPreferredOrNearby(
+				level = level,
+				preferredPlayer = placerId,
+				pos = pos,
+				radius = ALTAR_ADVANCEMENT_RADIUS,
+				advancement = ModAdvancements.ALTAR_BASE,
+			)
+			if (handled) {
+				baseAdvancementGranted = true
+				setChanged()
+			}
+		}
+
 		if (!baseValid && fusion.isRunning()) {
 			fusion.reset()
 			setChanged()
+			updateVisualState(level, pos, state, countCores(level, pos))
 			return
 		}
 
 		val present = countCores(level, pos)
-		when (val event = fusion.tick(present)) {
+		val altarEvent = fusion.tick(present)
+		// 本 tick 结束后底座上还剩几个核心；直接用已有计数推算，避免再扫一遍实体
+		val coresLeft = when (altarEvent) {
+			is AltarEvent.StageAbsorbed -> present - 1
+			AltarEvent.FusionComplete -> 0
+			else -> present
+		}
+		when (altarEvent) {
 			is AltarEvent.StageAbsorbed -> {
 				consumeOneCore(level, pos)
-				playStageEffects(level, pos, event.absorbed)
+				playStageEffects(level, pos, altarEvent.absorbed)
 				setChanged()
 			}
 
@@ -77,6 +126,14 @@ class UltimateAltarBlockEntity(pos: BlockPos, state: BlockState) :
 				setChanged()
 				// 先放特效（含落雷）再产出，避免产物先落地被雷声"抢戏"
 				playCompletionEffects(level, pos)
+				// 成就"天打雷劈"：雷电劈下的同一 tick，发给启动融合的玩家（不在线时发给附近玩家）。
+				ModAdvancements.awardPreferredOrNearby(
+					level = level,
+					preferredPlayer = startedById,
+					pos = pos,
+					radius = ALTAR_ADVANCEMENT_RADIUS,
+					advancement = ModAdvancements.CREATION_CORE,
+				)
 				spawnOutput(level, pos)
 			}
 
@@ -87,6 +144,31 @@ class UltimateAltarBlockEntity(pos: BlockPos, state: BlockState) :
 			}
 
 			AltarEvent.Idle -> if (fusion.isRunning()) spawnChargeParticles(level, pos)
+		}
+
+		updateVisualState(level, pos, state, coresLeft)
+	}
+
+	/**
+	 * 把"在跑 / 底座不对 / 三核就位 / 空转"翻译成方块状态。
+	 *
+	 * 只服务表现：贴图与发光强度由方块状态驱动，客户端由原版同步机制自动拿到，
+	 * 不需要自定义包。
+	 *
+	 * 优先级：融合中 > 底座不正确 > 三核就位 > 空转（底座被挖的那一瞬以"在跑"为准，
+	 * 不会先闪一下红环）。
+	 */
+	private fun updateVisualState(level: ServerLevel, pos: BlockPos, state: BlockState, coresOnBase: Int) {
+		val visual = when {
+			fusion.isRunning() -> UltimateAltarBlock.AltarState.ACTIVE
+			!baseValid -> UltimateAltarBlock.AltarState.INVALID
+			// 先比数量再比种类：数量对不上就直接跳过，空转时不额外扫实体
+			coresOnBase == ShenzhiMod.config.altar.requiredCores && hasCorrectCores(level, pos) ->
+				UltimateAltarBlock.AltarState.READY
+			else -> UltimateAltarBlock.AltarState.IDLE
+		}
+		if (state.getValue(UltimateAltarBlock.STATE) !== visual) {
+			level.setBlock(pos, state.setValue(UltimateAltarBlock.STATE, visual), Block.UPDATE_ALL)
 		}
 	}
 
@@ -146,14 +228,40 @@ class UltimateAltarBlockEntity(pos: BlockPos, state: BlockState) :
 			player.sendSystemMessage(Component.translatable("message.shenzhimod.altar.base_invalid"))
 			return
 		}
-		val present = countCores(level, worldPosition)
-		if (fusion.start(present)) {
+		// 必须是**三种不同的核心各一个**，且底座范围内不能有别的物品（2026-10-02 反馈：
+		// 之前只数了数量，放三个农业核心也能开炉）。这里按"实体个数 + 种类集合 + 无杂项"三重判定。
+		if (!hasCorrectCores(level, worldPosition)) {
+			player.sendSystemMessage(Component.translatable("message.shenzhimod.altar.wrong_cores"))
+			return
+		}
+		if (fusion.start(ShenzhiMod.config.altar.requiredCores)) {
+			startedById = player.uuid
+			setChanged()
 			level.playSound(null, worldPosition.x + 0.5, worldPosition.y + 0.5, worldPosition.z + 0.5, SoundEvents.BEACON_ACTIVATE, SoundSource.BLOCKS, 1.0f, 1.0f)
 			player.sendSystemMessage(Component.translatable("message.shenzhimod.altar.started"))
 			setChanged()
 		} else {
 			player.sendSystemMessage(Component.translatable("message.shenzhimod.altar.not_ready"))
 		}
+	}
+
+	/**
+	 * 底座附近是否为"合法三核"：
+	 * 1. 核心掉落物**恰好** [ShenzhiMod.config.altar.requiredCores] 个（多了少了都不行）；
+	 * 2. 种类集合正好是 农业 / 矿物 / 战斗 三种（重复种类 → 集合变小 → 拒绝）；
+	 * 3. 范围内**没有其它物品**（有杂项一律不开炉）。
+	 */
+	private fun hasCorrectCores(level: ServerLevel, pos: BlockPos): Boolean {
+		val required = ShenzhiMod.config.altar.requiredCores
+		val cores = coreEntities(level, pos)
+		if (cores.size != required) return false
+		val ids = cores.mapNotNull { ItemStacks.idOf(it.item) }.toSet()
+		if (ids != CoreAssemblyDefaults.coreItemIds()) return false
+		val box = coreBox(pos)
+		val others = level.getEntitiesOfClass(ItemEntity::class.java, box) { entity ->
+			entity.isAlive && ItemStacks.idOf(entity.item) !in CoreAssemblyDefaults.coreItemIds()
+		}
+		return others.isEmpty()
 	}
 
 	fun describeStatus(): Component = when {
@@ -170,18 +278,8 @@ class UltimateAltarBlockEntity(pos: BlockPos, state: BlockState) :
 	// ---- 世界交互 ----
 
 	private fun checkBase(level: ServerLevel, pos: BlockPos): Boolean {
-		val config = ShenzhiMod.config.altar
-		val expected = ItemStacks.of(config.baseBlockId).item
-		if (expected === net.minecraft.world.item.Items.AIR) return false
-		val block = expected as? net.minecraft.world.item.BlockItem ?: return false
-		val half = config.baseSize / 2
-		for (dx in -half..half) {
-			for (dz in -half..half) {
-				val state = level.getBlockState(pos.offset(dx, -1, dz))
-				if (!state.`is`(block.block)) return false
-			}
-		}
-		return true
+		// 判定逻辑与"放下瞬间"共用一处，避免两边规则漂移
+		return UltimateAltarBlock.isBaseComplete(level, pos)
 	}
 
 	private fun coreBox(pos: BlockPos): AABB {
@@ -243,6 +341,9 @@ class UltimateAltarBlockEntity(pos: BlockPos, state: BlockState) :
 		output.putString("Phase", fusion.phase.name)
 		output.putInt("Absorbed", fusion.absorbed)
 		output.putInt("StageProgress", fusion.currentStageProgress())
+		output.putBoolean("BaseAdvancementGranted", baseAdvancementGranted)
+		placerId?.let { output.putString("Placer", it.toString()) }
+		startedById?.let { output.putString("StartedBy", it.toString()) }
 	}
 
 	override fun loadAdditional(input: ValueInput) {
@@ -250,11 +351,17 @@ class UltimateAltarBlockEntity(pos: BlockPos, state: BlockState) :
 		val phase = runCatching { AltarPhase.valueOf(input.getStringOr("Phase", AltarPhase.IDLE.name)) }
 			.getOrDefault(AltarPhase.IDLE)
 		fusion.restore(phase, input.getIntOr("Absorbed", 0), input.getIntOr("StageProgress", 0))
+		baseAdvancementGranted = input.getBooleanOr("BaseAdvancementGranted", false)
+		placerId = input.getStringOr("Placer", "").takeIf { it.isNotEmpty() }?.let { runCatching { UUID.fromString(it) }.getOrNull() }
+		startedById = input.getStringOr("StartedBy", "").takeIf { it.isNotEmpty() }?.let { runCatching { UUID.fromString(it) }.getOrNull() }
 		baseValid = false
 		baseCheckCooldown = 0
 	}
 
 	private companion object {
 		const val BASE_CHECK_INTERVAL_TICKS = 20
+
+		/** 成就的"就近发放"半径：祭坛流程都是近距离交互，16 格足够覆盖实际玩家。 */
+		const val ALTAR_ADVANCEMENT_RADIUS = 16.0
 	}
 }

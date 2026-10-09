@@ -17,6 +17,7 @@ import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.storage.ValueInput
@@ -57,6 +58,7 @@ class SyntheticDragonHeadBlockEntity(pos: BlockPos, state: BlockState) :
 			if (!ledger.isEmpty()) {
 				ejectAll(level, pos)
 			}
+			setActive(level, pos, false)
 			return
 		}
 
@@ -68,6 +70,59 @@ class SyntheticDragonHeadBlockEntity(pos: BlockPos, state: BlockState) :
 		}
 
 		tickCrafting(level, pos, config.dragonHead.craftDurationTicks)
+		// 倒计时是否在进行 → 方块状态（客户端渲染器据此做"下颚动 + 眼睛发亮"）
+		setActive(level, pos, craftRecipe != null)
+		emitWorkingEffects(level, pos, crafting = craftRecipe != null)
+	}
+
+	/**
+	 * 同步"正在合成"的方块状态（2026-09-30 反馈 #2：整个合成过程龙首毫无变化）。
+	 *
+	 * 这个状态只用于**方块自发光**（lightLevel）与"开始合成"的那一刻音效；
+	 * 眼睛颜色由渲染器恒定为选定配色（2026-10-02：状态驱动的双贴图切换在 26.1 上会慢一拍/卡住）。
+	 * 只在状态真正变化时写方块，避免每 tick 刷方块更新。
+	 */
+	private fun setActive(level: ServerLevel, pos: BlockPos, active: Boolean) {
+		val state = level.getBlockState(pos)
+		if (state.getValue(SyntheticDragonHeadBlock.ACTIVE) != active) {
+			level.setBlock(pos, state.setValue(SyntheticDragonHeadBlock.ACTIVE, active), Block.UPDATE_CLIENTS)
+			if (active) {
+				// 开始合成：一声"启动"音 + 一圈粒子
+				level.playSound(null, pos.x + 0.5, pos.y + 0.8, pos.z + 0.5, SoundEvents.BEACON_ACTIVATE, SoundSource.BLOCKS, 0.7f, 1.4f)
+				if (ShenzhiMod.config.visual.particlesEnabled) {
+					level.sendParticles(ParticleTypes.END_ROD, pos.x + 0.5, pos.y + 1.1, pos.z + 0.5, 24, 0.45, 0.25, 0.45, 0.06)
+				}
+			}
+		}
+	}
+
+	/**
+	 * 运转中的粒子与音效（2026-10-02 反馈：合成过程"没有任何特效和音效"）。
+	 *
+	 * - 充能（吸收/待机）：每 10 tick 少量火花，头顶轻轻冒；
+	 * - 合成中：每 3 tick 一簇紫色粒子、每 40 tick 一声低沉的嗡鸣。
+	 * 全部用原版粒子与音效，不需要额外素材。
+	 */
+	private fun emitWorkingEffects(level: ServerLevel, pos: BlockPos, crafting: Boolean) {
+		if (!ShenzhiMod.config.visual.particlesEnabled) return
+		if (crafting) {
+			level.sendParticles(
+				ParticleTypes.ENCHANT,
+				pos.x + 0.5, pos.y + 1.35, pos.z + 0.5,
+				4, 0.4, 0.15, 0.4, 0.03,
+			)
+			if (tickCounter % 40 == 0) {
+				level.playSound(null, pos.x + 0.5, pos.y + 0.6, pos.z + 0.5, SoundEvents.BEACON_AMBIENT, SoundSource.BLOCKS, 0.5f, 0.7f)
+			}
+			return
+		}
+		if (tickCounter % 10 == 0) {
+			level.sendParticles(
+				ParticleTypes.END_ROD,
+				pos.x + 0.5, pos.y + 1.25, pos.z + 0.5,
+				1, 0.3, 0.05, 0.3, 0.01,
+			)
+		}
 	}
 
 	/** 扫描 3×3×3 范围内的掉落物，只接受压缩态白名单里的物品。 */
@@ -142,7 +197,8 @@ class SyntheticDragonHeadBlockEntity(pos: BlockPos, state: BlockState) :
 		if (ShenzhiMod.config.visual.particlesEnabled) {
 			level.sendParticles(ParticleTypes.END_ROD, pos.x + 0.5, pos.y + 1.2, pos.z + 0.5, 30, 0.5, 0.5, 0.5, 0.08)
 		}
-		spawn(level, pos, ItemStacks.of(matched.recipe.outputItemId), 0.2)
+		// 产物从**龙嘴向前**吐出（2026-10-02 反馈：像投掷器一样），而不是从头顶掉下来
+		spawnForward(level, pos, ItemStacks.of(matched.recipe.outputItemId))
 	}
 
 	/** 非充能吐回：把账本内容全部实体化到方块上方。 */
@@ -189,6 +245,24 @@ class SyntheticDragonHeadBlockEntity(pos: BlockPos, state: BlockState) :
 				(level.random.nextDouble() - 0.5) * velocity,
 			)
 		}
+		level.addFreshEntity(entity)
+	}
+
+	/**
+	 * 从龙嘴（朝向那一面的中部）向前吐出产物，模拟"从龙嘴吐出来"。
+	 * 初速贴近投掷器的手感：水平 0.45、略微上抛 0.08。
+	 */
+	private fun spawnForward(level: ServerLevel, pos: BlockPos, stack: ItemStack) {
+		if (stack.isEmpty) return
+		val facing = level.getBlockState(pos).getValue(SyntheticDragonHeadBlock.FACING)
+		val mouth = Vec3(
+			pos.x + 0.5 + facing.stepX * 0.8,
+			pos.y + 0.55,
+			pos.z + 0.5 + facing.stepZ * 0.8,
+		)
+		val entity = ItemEntity(level, mouth.x, mouth.y, mouth.z, stack)
+		entity.setDefaultPickUpDelay()
+		entity.deltaMovement = Vec3(facing.stepX * 0.45, 0.08, facing.stepZ * 0.45)
 		level.addFreshEntity(entity)
 	}
 

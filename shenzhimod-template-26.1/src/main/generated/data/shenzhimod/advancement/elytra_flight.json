@@ -1,0 +1,45 @@
+{
+  "parent": "shenzhimod:creation_core",
+  "criteria": {
+    "has_item": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:elytra",
+            "predicates": {
+              "minecraft:enchantments": [
+                {
+                  "enchantments": "shenzhimod:flight",
+                  "levels": {
+                    "min": 1
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "frame": "goal",
+    "icon": {
+      "id": "minecraft:elytra"
+    },
+    "title": {
+      "translate": "advancements.shenzhimod.elytra_flight.title"
+    },
+    "description": {
+      "translate": "advancements.shenzhimod.elytra_flight.description"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "requirements": [
+    [
+      "has_item"
+    ]
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "shenzhimod:item/limestone"
+    "model": "shenzhimod:block/limestone"
   }
 }

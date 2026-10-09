@@ -1,0 +1,28 @@
+{
+  "parent": "shenzhimod:root",
+  "criteria": {
+    "code": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "frame": "task",
+    "icon": {
+      "id": "shenzhimod:compressed_iron_block"
+    },
+    "title": {
+      "translate": "advancements.shenzhimod.compression.title"
+    },
+    "description": {
+      "translate": "advancements.shenzhimod.compression.description"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "requirements": [
+    [
+      "code"
+    ]
+  ]
+}

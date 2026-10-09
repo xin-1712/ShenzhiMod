@@ -10,11 +10,14 @@ import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.BaseEntityBlock
+import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.RenderShape
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.entity.BlockEntityTicker
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.StateDefinition
+import net.minecraft.world.level.block.state.properties.BooleanProperty
 import net.minecraft.world.phys.BlockHitResult
 
 /**
@@ -27,8 +30,17 @@ import net.minecraft.world.phys.BlockHitResult
  * 方块可放置、容器语义正确、进度可推进、产物可被漏斗抽走。
  */
 class TransmutationCoreBlock(properties: Properties) : BaseEntityBlock(properties) {
+	init {
+		// 默认静止态；工作时由方块实体把 LIT 打开（熔炉那套做法，客户端靠方块状态自动同步）
+		registerDefaultState(stateDefinition.any().setValue(LIT, false))
+	}
+
 	override fun codec(): MapCodec<out BaseEntityBlock> =
 		simpleCodec { props -> TransmutationCoreBlock(props) }
+
+	override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
+		builder.add(LIT)
+	}
 
 	override fun getRenderShape(state: BlockState): RenderShape = RenderShape.MODEL
 
@@ -62,5 +74,10 @@ class TransmutationCoreBlock(properties: Properties) : BaseEntityBlock(propertie
 		val serverPlayer = player as? ServerPlayer ?: return InteractionResult.PASS
 		serverPlayer.openMenu(blockEntity)
 		return InteractionResult.SUCCESS
+	}
+
+	companion object {
+		/** 是否正在转化（输入与催化剂都匹配、进度在走）。 */
+		val LIT: BooleanProperty = BooleanProperty.create("lit")
 	}
 }

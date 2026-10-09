@@ -47,6 +47,7 @@ object CoreEnchantDefaults {
 	 * 而且直接复用原版附魔 JSON 里的 `supported_items` 标签——这样"原版能附这个附魔的物品"
 	 * 与"核心附魔接受的物品"永远一致（含今后原版新增的武器类型，例如 26.1 的矛）：
 	 * - 锋利 → `#minecraft:enchantable/sharp_weapon`（剑 / 矛 / 斧）
+	 * - 保护 → `#minecraft:enchantable/chest_armor`（**只有胸甲**，不含头盔 / 护腿 / 靴子）
 	 * - 效率 → `#minecraft:enchantable/mining`（镐 / 斧 / 锹 / 锄 / 剪刀）
 	 * - 时运 → `#minecraft:enchantable/mining_loot`（镐 / 斧 / 锹 / 锄）
 	 * - 冷却 / 飞行 → 单个物品 ID（原版没有"可附冷却/飞行的物品"标签）
@@ -57,6 +58,7 @@ object CoreEnchantDefaults {
 		coreCostLevels: Int,
 		creationCoreCostLevels: Int,
 		sharpnessLevel: Int,
+		protectionLevel: Int,
 		efficiencyLevel: Int,
 		fortuneLevel: Int,
 	): List<CoreEnchantRule> = listOf(
@@ -68,6 +70,16 @@ object CoreEnchantDefaults {
 			enchantmentId = "minecraft:sharpness",
 			costLevels = coreCostLevels,
 			grantedLevel = sharpnessLevel,
+		),
+		CoreEnchantRule(
+			// 战斗核心的第二个用途：给胸甲写超上限的保护（其余护甲槽不匹配，直接退回原版逻辑）。
+			id = "protection_from_combat_core",
+			mediaItemId = COMBAT_CORE,
+			targetTags = setOf("minecraft:enchantable/chest_armor"),
+			targetItemIds = emptySet(),
+			enchantmentId = "minecraft:protection",
+			costLevels = coreCostLevels,
+			grantedLevel = protectionLevel,
 		),
 		CoreEnchantRule(
 			id = "efficiency_from_mineral_core",

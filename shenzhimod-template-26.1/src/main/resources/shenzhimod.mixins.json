@@ -11,7 +11,8 @@
 	],
 	"client": [
 		"AnvilScreenMixin",
-		"ClientPacketListenerMixin"
+		"ClientPacketListenerMixin",
+		"AvatarRendererFlightAnimationMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

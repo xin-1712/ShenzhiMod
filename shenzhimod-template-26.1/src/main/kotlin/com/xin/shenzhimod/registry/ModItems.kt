@@ -31,7 +31,8 @@ object ModItems {
 		TagKey.create(Registries.DAMAGE_TYPE, ModRegistry.id("creation_core_immune"))
 
 	// ---- 前体材料（模块 D） ----
-	val LIMESTONE: Item = ModRegistry.item("limestone") { Item(it.stacksTo(64)) }
+	/** 石灰岩：可直接放置的方块（2026-09-30 反馈），物品形态即方块物品。 */
+	val LIMESTONE: Item = ModRegistry.blockItem(ModBlocks.LIMESTONE, "limestone")
 
 	// ---- 投掷物材料（模块 H） ----
 	/** 右键直接投掷，参数对齐附魔之瓶；堆叠 64、防火（§4.8）。 */
@@ -54,7 +55,16 @@ object ModItems {
 	// ---- 37 个压缩态（模块 A） ----
 	val COMPRESSED: Map<String, Item> = CompressionDefaults.ENTRIES.associate { entry ->
 		entry.outputPath to ModRegistry.item(entry.outputPath) { properties ->
-			CompressedItem(properties.stacksTo(64).fireResistant(), entry.sourceItemId, entry.count)
+			// `ENCHANTMENT_GLINT_OVERRIDE` = 原版附魔闪光（"和附魔一样的发光特效"，
+			// 2026-09-30 反馈 #7）；贴图另外叠了一圈偏黑的紫光晕。
+			CompressedItem(
+				properties
+					.stacksTo(64)
+					.fireResistant()
+					.component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true),
+				entry.sourceItemId,
+				entry.count,
+			)
 		}
 	}
 

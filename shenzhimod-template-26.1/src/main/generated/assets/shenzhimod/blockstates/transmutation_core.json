@@ -1,7 +1,10 @@
 {
   "variants": {
-    "": {
+    "lit=false": {
       "model": "shenzhimod:block/transmutation_core"
+    },
+    "lit=true": {
+      "model": "shenzhimod:block/transmutation_core_lit"
     }
   }
 }

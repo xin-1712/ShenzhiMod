@@ -1,0 +1,28 @@
+{
+  "parent": "shenzhimod:root",
+  "criteria": {
+    "code": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "frame": "task",
+    "icon": {
+      "id": "shenzhimod:ultimate_altar"
+    },
+    "title": {
+      "translate": "advancements.shenzhimod.altar_base.title"
+    },
+    "description": {
+      "translate": "advancements.shenzhimod.altar_base.description"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "requirements": [
+    [
+      "code"
+    ]
+  ]
+}

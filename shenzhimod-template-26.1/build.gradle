@@ -20,6 +20,14 @@ repositories {
 			includeGroup 'carpet'
 		}
 	}
+	// JEI 的 API 仓库。只在编译期使用：插件类引用 JEI 的 API，运行时由玩家自己的 JEI 提供。
+	maven {
+		name = 'blamejared'
+		url = 'https://maven.blamejared.com/'
+		content {
+			includeGroup 'mezz.jei'
+		}
+	}
 }
 
 fabricApi {
@@ -38,7 +46,7 @@ dependencies {
     implementation "net.fabricmc:fabric-language-kotlin:${project.fabric_kotlin_version}"
 
 	// Optional Carpet reference jar (compile-only). It exists purely so a developer can
-	// re-verify the bastion spawn parameters documented in the requirements doc (§6.7).
+	// re-verify the bastion spawn parameters used by this mod.
 	// It is NOT needed to build or run ShenzhiMod, so it stays opt-in to keep fresh
 	// clones buildable without the masa maven:
 	//     .\gradlew.bat build -PcarpetReference=true
@@ -47,6 +55,25 @@ dependencies {
 	// unless the mod is intentionally made to depend on Carpet at runtime.
 	if (providers.gradleProperty('carpetReference').map { it.toBoolean() }.getOrElse(false)) {
 		dependencies.add('compileOnly', "carpet:fabric-carpet:${project.carpet_version}")
+	}
+
+	// JEI 集成（可选依赖）。
+	// - 用官方提供的 **纯 API 构件** `jei-26.1-fabric-api`（会传递依赖 `jei-26.1-common-api`，
+	//   里面就是完整的 `mezz.jei.api` 包），下载量只有一百多 KB；
+	// - 只进 `compileOnly`：**不打包、不要求玩家安装**，没装 JEI 时插件类根本不会被加载
+	//   （入口点是 `fabric.mod.json` 里的 `jei_mod_plugin`，只有 JEI 自己会去读）；
+	// - 坐标按 MC 补丁版本区分（`26.1` / `26.1.1` ...），升级 MC 时同步改 `gradle.properties` 里的 `jei_version`。
+	// - Loom 1.17 已没有 `modCompileOnly` 配置（见上），普通 `compileOnly` 即可：
+	//   JEI 的构件本身就是官方映射，与我们的开发/运行命名空间一致，不需要 remap。
+	compileOnly "mezz.jei:jei-26.1-fabric-api:${project.jei_version}"
+
+	// 想在**开发环境里真的跑一遍 JEI**（检查分类、配方面板、核心的物品信息页）时用：
+	//     .\gradlew.bat runClient -PjeiRuntime=true
+	// `localRuntime` = 只进**开发运行环境**的模组：不会打进 jar、不会成为发布依赖、
+	// 不会写进任何被跟踪的文件；默认构建（不带 -PjeiRuntime）完全不碰它。
+	// 之所以做成开关而不是默认加载：日常开发没必要让每次 runClient 都多下一个 1.5 MB 的完整 mod。
+	if (providers.gradleProperty('jeiRuntime').map { it.toBoolean() }.getOrElse(false)) {
+		dependencies.add('localRuntime', "mezz.jei:jei-26.1-fabric:${project.jei_version}")
 	}
 }
 

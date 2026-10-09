@@ -1,6 +1,7 @@
 package com.xin.shenzhimod.interaction
 
 import com.xin.shenzhimod.ShenzhiMod
+import com.xin.shenzhimod.advancement.ModAdvancements
 import com.xin.shenzhimod.data.ShenzhiTables
 import com.xin.shenzhimod.util.ItemStacks
 import net.fabricmc.fabric.api.event.player.UseBlockCallback
@@ -73,7 +74,7 @@ object AnvilCompressionHandler {
 		val entities = level.getEntitiesOfClass(ItemEntity::class.java, box) { it.isAlive }
 		if (entities.isEmpty()) return
 
-		// 需求：只能有一种物品，混放则完全无反应。
+		// 需求：只能有一种物品，混放则完全无反应（2026-09-30 确认：保持原设计的"无反应"，不加提示）。
 		val byItem = entities.groupBy { ItemStacks.idOf(it.item) ?: return }
 		if (byItem.size != 1) return
 		val (sourceItemId, stacks) = byItem.entries.first()
@@ -123,6 +124,10 @@ object AnvilCompressionHandler {
 		val direction = Vec3(player.x - (spawnPos.x + 0.5), 0.0, player.z - (spawnPos.z + 0.5)).normalize().scale(0.15)
 		entity.deltaMovement = Vec3(direction.x, 0.2, direction.z)
 		level.addFreshEntity(entity)
+
+		// 成就"大力出奇迹"：**就在这一次真正压出压缩态的时刻**授予（不是捡起物品的时候）。
+		// 这是需求明确指定的时刻，因此条件写成 impossible、由代码授予。
+		(player as? ServerPlayer)?.let { ModAdvancements.award(it, ModAdvancements.COMPRESSION) }
 	}
 
 	/** 扫描盒边长：铁砧上方 3×3×3（需求 §4.1）。 */

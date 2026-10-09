@@ -2,6 +2,7 @@ package com.xin.shenzhimod
 
 import com.xin.shenzhimod.datagen.ModBlockLootProvider
 import com.xin.shenzhimod.datagen.ModBlockStateProvider
+import com.xin.shenzhimod.datagen.ModAdvancementProvider
 import com.xin.shenzhimod.datagen.ModItemModelProvider
 import com.xin.shenzhimod.datagen.ModLanguageProvider
 import com.xin.shenzhimod.datagen.ModRecipeProvider
@@ -32,6 +33,7 @@ object ShenzhiModDataGenerator : DataGeneratorEntrypoint {
 		pack.addProvider { output: FabricPackOutput -> ModBlockStateProvider(output) }
 		pack.addProvider { output: FabricPackOutput -> ModRecipeProvider(output) }
 		pack.addProvider { output: FabricPackOutput -> ShenzhiDataProvider(output) }
+		pack.addProvider { output: FabricPackOutput -> ModAdvancementProvider(output) }
 
 		pack.addProvider { output: FabricPackOutput, registries: CompletableFuture<HolderLookup.Provider> ->
 			ModLanguageProvider(output, "en_us", registries)

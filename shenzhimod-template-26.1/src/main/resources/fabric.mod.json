@@ -8,8 +8,9 @@
 		"ShenzhiMod Contributors"
 	],
 	"contact": {
-		"homepage": "https://github.com/",
-		"sources": "https://github.com/"
+		"homepage": "https://github.com/xin-1712/ShenzhiMod",
+		"sources": "https://github.com/xin-1712/ShenzhiMod",
+		"issues": "https://github.com/xin-1712/ShenzhiMod/issues"
 	},
 	"license": "MIT",
 	"icon": "assets/shenzhimod/icon.png",
@@ -34,6 +35,12 @@
 				"adapter": "kotlin"
 			}
 		],
+		"jei_mod_plugin": [
+			{
+				"value": "com.xin.shenzhimod.compat.jei.ShenzhiJeiPlugin",
+				"adapter": "kotlin"
+			}
+		],
 		"client": [
 			{
 				"value": "com.xin.shenzhimod.ShenzhiModClient",
@@ -50,5 +57,8 @@
 		"java": ">=25",
 		"fabric-api": "*",
 		"fabric-language-kotlin": "*"
+	},
+	"suggests": {
+		"jei": ">=29.2.0"
 	}
 }
